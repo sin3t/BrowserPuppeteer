@@ -1,0 +1,16 @@
+{
+  "title": "BrowserPuppeteer",
+  "name": "BrowserPuppeteer",
+  "version": "0.1.0",
+  "description": "Complete text command-based extention to control browser.Allows user to quickly jump from tab-to-tab within numbers. Provide tab numbering functionality",
+  "main": "index.js",
+  "author": "sin3t",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MIT",
+  "keywords": [
+    "jetpack"
+  ]
+}
