@@ -1,4 +1,3 @@
-
 const TABINDEX_ANONID = 'tabindex';
 const XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
@@ -6,21 +5,21 @@ const
     BROWSER = 'navigator:browser',
     NEWTAB_URL = 'about:home',
 
-	SCROLL_STEP = 50,
+    SCROLL_STEP = 50,
     TABVIEW_POLLING_TIME = 1000,
     TOOLBARBTN_STYLE_BADGECOLOR = '#CC0000',
 
     DELIM_SEVERVALS = ',',
-	DELIM_RANGE = '-',
-	DELIM_PATH = '/',
-	DELIM_HOST = '"',
-	DELIM_EXCLUDING = '!',
-	DELIM_TITLE_LEFT = '<',
-	DELIM_TITLE_RIGHT = '>',
+    DELIM_RANGE = '-',
+    DELIM_PATH = '/',
+    DELIM_HOST = '"',
+    DELIM_EXCLUDING = '!',
+    DELIM_TITLE_LEFT = '<',
+    DELIM_TITLE_RIGHT = '>',
     DELIM_AND_CONDITION = '&',
-	DELIM_PLACE_AFTER = 'a',
-	DELIM_PLACE_BEFORE = 'b',
-	DELIM_PLACE_AT = '@',
+    DELIM_PLACE_AFTER = 'a',
+    DELIM_PLACE_BEFORE = 'b',
+    DELIM_PLACE_AT = '@',
     DELIM_PLACE_GROUP = 'g',
     DELIM_PLACE_WINDOW = 'w',
 
@@ -34,32 +33,32 @@ const
     EXEC_PARTIALOK = "PARTIAL_OK",
 
     ACTION_CLOSE = "x",
-	ACTION_CREATE = "c",
-	ACTION_GOTO_G = "g",
-	ACTION_GOTO_T = "",
-	ACTION_GOTO_W = "w",
-	ACTION_MOVE = "m",
-	ACTION_ALIAS = "a",
+    ACTION_CREATE = "c",
+    ACTION_GOTO_G = "g",
+    ACTION_GOTO_T = "",
+    ACTION_GOTO_W = "w",
+    ACTION_MOVE = "m",
+    ACTION_ALIAS = "a",
     ACTION_SEARCH = "?",
-	ACTION_BOOKMARK = "b",
+    ACTION_BOOKMARK = "b",
     ACTION_UNLOAD_T = "u",
-	ACTION_RELOAD_T = "r",
+    ACTION_RELOAD_T = "r",
     ACTION_LIST_INFO = "l",
-	ACTION_STOPLOAD_T = "s",
-	ACTION_TOOGLE_PINNING = "p",
+    ACTION_STOPLOAD_T = "s",
+    ACTION_TOOGLE_PINNING = "p",
     ACTION_TREESTYLETAB_CONTROL = "t",
 
-	TABLABEL_POSITION = '950',
-	TABLABEL_STYLE_COLOR = '#FFFFFF',
+    TABLABEL_POSITION = '950',
+    TABLABEL_STYLE_COLOR = '#FFFFFF',
     TABLABEL_STYLE_FONTSIZE = '11px',
     TABLABEL_STYLE_MINWIDTH = '14px',
     TABLABEL_STYLE_PINNED_MINWIDTH = '9px',
     TABLABEL_STYLE_MINHEIGHT = '14px',
     TABLABEL_STYLE_TEXTALIGN = 'center',
-	TABLABEL_STYLE_ANIMATION = 'none',
+    TABLABEL_STYLE_ANIMATION = 'none',
     TABLABEL_STYLE_FONTWEIGHT = 'bold',
     TABLABEL_STYLE_BORDERRADIUS = '2px',
-	TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000';
+    TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000';
 
 
 const { Cc, Ci, Cm, Cu, Cr, components } = require("chrome");
@@ -76,11 +75,11 @@ var tabs_utils = require('sdk/tabs/utils');
 
 //== Pure ns* low-level components ============================================
 var historyService = Cc["@mozilla.org/browser/nav-history-service;1"]
-				   	.getService(Ci.nsINavHistoryService);
+                    .getService(Ci.nsINavHistoryService);
 var bookmarksService = Cc["@mozilla.org/browser/nav-bookmarks-service;1"]
-				 	.getService(Ci.nsINavBookmarksService);
+                    .getService(Ci.nsINavBookmarksService);
 var IOService = Cc["@mozilla.org/network/io-service;1"]
-				   	.getService(Ci.nsIIOService);
+                    .getService(Ci.nsIIOService);
 
 
 //== Add group/window informational buttons ===================================
@@ -130,15 +129,15 @@ function setBtnBadgeValue(btn, window, value){
 
 var data = require("sdk/self").data;
 var commandsPopup = require("sdk/panel").Panel({
-	position: { 
-		top: 40, 
-	},
-	height:50,
-	contentURL: data.url("commandsPopup.html"),
-	contentScriptFile: data.url("commandsPopupLogic.js"),
-	contentScript: "self.port.emit('resize', " +
-				   "{width: document.documentElement.clientWidth, " +
-				   "height: document.documentElement.clientHeight});",
+    position: { 
+        top: 40, 
+    },
+    height:50,
+    contentURL: data.url("commandsPopup.html"),
+    contentScriptFile: data.url("commandsPopupLogic.js"),
+    contentScript: "self.port.emit('resize', " +
+                   "{width: document.documentElement.clientWidth, " +
+                   "height: document.documentElement.clientHeight});",
 });
 let { getActiveView }=require("sdk/view/core");
 getActiveView(commandsPopup).querySelector("iframe").setAttribute("tooltip", "aHTMLTooltip");
@@ -175,26 +174,26 @@ commandsPopup.port.on("text-entered", function (cmd) {
 });
 
 commandsPopup.port.on("can-be-hiden", function (){
-	commandsPopup.hide();
+    commandsPopup.hide();
 });
 
 //=============================================================================
 // TODO: Do index remapping on window close, update button badges
 var WindowsManager = {
-	windowEnum : Services.wm.getEnumerator(BROWSER),
-	init : function() {
-		while(this.windowEnum.hasMoreElements()){
-			let window = this.windowEnum.getNext();
-			let windowId = window.QueryInterface(Ci.nsIInterfaceRequestor).
-				getInterface(Ci.nsIDOMWindowUtils).outerWindowID;
+    windowEnum : Services.wm.getEnumerator(BROWSER),
+    init : function() {
+        while(this.windowEnum.hasMoreElements()){
+            let window = this.windowEnum.getNext();
+            let windowId = window.QueryInterface(Ci.nsIInterfaceRequestor).
+                getInterface(Ci.nsIDOMWindowUtils).outerWindowID;
 
-			var manager = new TM();
-			manager.TabsManager.ownerWindow = window;
-			manager.TabsManager.events.subscribeTabEvents();
-			manager.TabsManager.updateLabelsData();
-			this.windowToManagerMap.set(window, manager);
+            var manager = new TM();
+            manager.TabsManager.ownerWindow = window;
+            manager.TabsManager.events.subscribeTabEvents();
+            manager.TabsManager.updateLabelsData();
+            this.windowToManagerMap.set(window, manager);
 
-			this.idToWindowMap.set(windowId, window);
+            this.idToWindowMap.set(windowId, window);
             this.doIndexIdRemaping();
             
             setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
@@ -202,8 +201,8 @@ var WindowsManager = {
                           ('action-button--browserpuppeteer-' + id);
             const buttonView = require('sdk/ui/button/view');
             buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
-		}
-	},
+        }
+    },
 
     uninit : function() {
         for (let window of this.windowToManagerMap.keys()){
@@ -214,20 +213,20 @@ var WindowsManager = {
         }
     },
 
-	windowToManagerMap : new Map(),
-	idToWindowMap : new Map(),
+    windowToManagerMap : new Map(),
+    idToWindowMap : new Map(),
     openedWindows : [],
-	tabsManagers : [],
+    tabsManagers : [],
     indexToIdMap : {},
     idToIndexMap : {},
 
-	get handlingTabsManagers() {
-		return this.windowToManagerMap.values();
-	},
-	
-	get handlingWindows() {
-		return this.windowToManagerMap.keys();
-	},
+    get handlingTabsManagers() {
+        return this.windowToManagerMap.values();
+    },
+    
+    get handlingWindows() {
+        return this.windowToManagerMap.keys();
+    },
 
     doIndexIdRemaping : function(){
         let index = 1;
@@ -248,75 +247,75 @@ var WindowsManager = {
             dataArray.push({windowId : T_WINDOW + this.actions.getWindowIndex(window),
                     countOfTabs : window.gBrowser.visibleTabs.length,
                     title : window.document.title,
-					thumbnail : this.actions.getThumbnailURIForWindow(window)});
+                    thumbnail : this.actions.getThumbnailURIForWindow(window)});
         }
         return {headers, dataArray};
     },
 
-	actions : {
-		openWindow : function(target, aParams ){
-			let parentWindow = aParams.callerWindow;
-			parentWindow.openNewWindowWith(NEWTAB_URL);	
-		},
+    actions : {
+        openWindow : function(target, aParams ){
+            let parentWindow = aParams.callerWindow;
+            parentWindow.openNewWindowWith(NEWTAB_URL); 
+        },
 
-		closeWindow : function(window){
-			window.close();	
-		},
+        closeWindow : function(window){
+            window.close(); 
+        },
 
-		closeWindowAt : function(index){
+        closeWindowAt : function(index){
             let window = this.getWindowAt(index);
-			this.closeWindow(window)
-		},
+            this.closeWindow(window)
+        },
 
-		switchToWindow : function(window){
-			window.focus();		
-		},
+        switchToWindow : function(window){
+            window.focus();     
+        },
 
-		switchToWindowAt : function(index){
+        switchToWindowAt : function(index){
             let window = this.getWindowAt(parseInt(index));
-			this.switchToWindow(window);	
-		},
+            this.switchToWindow(window);    
+        },
 
         focusNextWindow : function(){
              
         },
 
         getThumbnailCanvasForWindow : function(window) {
-			// Code from https://github.com/mozilla/addon-sdk/blob/master/lib/sdk/content/thumbnail.js
-			let aspectRatio = 0.5625; // 16:9
-			const NS = 'http://www.w3.org/1999/xhtml';
-			const COLOR = 'rgb(255,255,255)';
+            // Code from https://github.com/mozilla/addon-sdk/blob/master/lib/sdk/content/thumbnail.js
+            let aspectRatio = 0.5625; // 16:9
+            const NS = 'http://www.w3.org/1999/xhtml';
+            const COLOR = 'rgb(255,255,255)';
 
-			let thumbnail = Services.appShell.hiddenDOMWindow.document
-			  				.createElementNS(NS, 'canvas');
-			thumbnail.mozOpaque = true;
-			thumbnail.width = Math.ceil(window.screen.availWidth / 5.75);
-			thumbnail.height = Math.round(thumbnail.width * aspectRatio);
-			let ctx = thumbnail.getContext('2d');
-			let snippetWidth = window.innerWidth * .6;
-			let scale = thumbnail.width / snippetWidth;
-			ctx.scale(scale, scale);
-			ctx.drawWindow(window, window.scrollX, window.scrollY, snippetWidth,
-							snippetWidth * aspectRatio, COLOR);
-			return thumbnail;
+            let thumbnail = Services.appShell.hiddenDOMWindow.document
+                            .createElementNS(NS, 'canvas');
+            thumbnail.mozOpaque = true;
+            thumbnail.width = Math.ceil(window.screen.availWidth / 5.75);
+            thumbnail.height = Math.round(thumbnail.width * aspectRatio);
+            let ctx = thumbnail.getContext('2d');
+            let snippetWidth = window.innerWidth * .6;
+            let scale = thumbnail.width / snippetWidth;
+            ctx.scale(scale, scale);
+            ctx.drawWindow(window, window.scrollX, window.scrollY, snippetWidth,
+                            snippetWidth * aspectRatio, COLOR);
+            return thumbnail;
         },
 
-		getThumbnailURIForWindow : function(window){
-			// BLANK = 'data:image/png;base64,' +
+        getThumbnailURIForWindow : function(window){
+            // BLANK = 'data:image/png;base64,' +
             //       'iVBORw0KGgoAAAANSUhEUgAAAFAAAAAtCAYAAAA5reyyAAAAJElEQVRoge3BAQ'+
-			//     'EAAACCIP+vbkhAAQAAAAAAAAAAAAAAAADXBjhtAAGQ0AF/AAAAAElFTkSuQmCC';
-			return this.getThumbnailCanvasForWindow(window).toDataURL();
-		},
+            //     'EAAACCIP+vbkhAAQAAAAAAAAAAAAAAAADXBjhtAAGQ0AF/AAAAAElFTkSuQmCC';
+            return this.getThumbnailCanvasForWindow(window).toDataURL();
+        },
 
-		getCurrentWindow : function(){
-			return Services.wm.getMostRecentWindow(BROWSER);
-		},
+        getCurrentWindow : function(){
+            return Services.wm.getMostRecentWindow(BROWSER);
+        },
 
-		getWindowId : function(window){
-			let windowId = window.QueryInterface(Ci.nsIInterfaceRequestor).
-				getInterface(Ci.nsIDOMWindowUtils).outerWindowID;
-			return windowId;
-		},
+        getWindowId : function(window){
+            let windowId = window.QueryInterface(Ci.nsIInterfaceRequestor).
+                getInterface(Ci.nsIDOMWindowUtils).outerWindowID;
+            return windowId;
+        },
 
         getWindowAt : function(index) {
             let id = this.getWindowIdAt(index);
@@ -337,24 +336,24 @@ var WindowsManager = {
         getCurrentWindowIndex : function() {
             return this.getWindowIndex(this.getCurrentWindow());
         }
-	},
+    },
 
-	events : {
-		windowListener : {
-			onOpenWindow : function (xulWindow) {
+    events : {
+        windowListener : {
+            onOpenWindow : function (xulWindow) {
                 var window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
                               .getInterface(Ci.nsIDOMWindow);
                  function onWindowLoad() {
-            		window.removeEventListener("load",onWindowLoad);
-            		if (window.document.documentElement
-							.getAttribute("windowtype") == BROWSER){
-						var manager = new TM();
-						manager.TabsManager.ownerWindow = window;
-						manager.TabsManager.events.subscribeTabEvents();
-						manager.TabsManager.updateLabelsData();
-						WindowsManager.windowToManagerMap.set(window, manager);
+                    window.removeEventListener("load",onWindowLoad);
+                    if (window.document.documentElement
+                            .getAttribute("windowtype") == BROWSER){
+                        var manager = new TM();
+                        manager.TabsManager.ownerWindow = window;
+                        manager.TabsManager.events.subscribeTabEvents();
+                        manager.TabsManager.updateLabelsData();
+                        WindowsManager.windowToManagerMap.set(window, manager);
 
-						WindowsManager.idToWindowMap.set(WindowsManager.actions.getWindowId(window), window);
+                        WindowsManager.idToWindowMap.set(WindowsManager.actions.getWindowId(window), window);
                         // =================================
                         WindowsManager.doIndexIdRemaping();
                         setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
@@ -365,11 +364,11 @@ var WindowsManager = {
                         buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
                         // getActiveView(groupStateBtn, window).style.display = 'none';
                         // viewFor(groupStateBtn).style.display = "none";
-					}
-        		}
-        		window.addEventListener("load",onWindowLoad);
-			},
-			onCloseWindow : function (xulWindow) {
+                    }
+                }
+                window.addEventListener("load",onWindowLoad);
+            },
+            onCloseWindow : function (xulWindow) {
                 // Temp bug fix: hide popup before closing to avoid its destruction
                 commandsPopup.hide();
                 var window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -381,36 +380,36 @@ var WindowsManager = {
 
                 let idToDelete = WindowsManager.actions.getWindowId(window);
                 WindowsManager.idToWindowMap.delete(idToDelete);
-			},
-			onWindowTitleChange : function (aWindow, aTitle) {
-			}
-		}
-	}
+            },
+            onWindowTitleChange : function (aWindow, aTitle) {
+            }
+        }
+    }
 }
 
 function TM() {
 this.TabsManager = {
-	_ownerWindow : null,
-	groupsMaps : new Map(),
-	commandsHistory : [],
-	lastActiveGroupItem : null,
+    _ownerWindow : null,
+    groupsMaps : new Map(),
+    commandsHistory : [],
+    lastActiveGroupItem : null,
     tabViewPollingFinished : false,
 
-	get ownerWindow(){
-		return this._ownerWindow;
-	},
+    get ownerWindow(){
+        return this._ownerWindow;
+    },
 
-	set ownerWindow(window){
-		this._ownerWindow = window;
-	},
+    set ownerWindow(window){
+        this._ownerWindow = window;
+    },
 
-	get gBrowser () {
-		return this.ownerWindow.gBrowser;
-	},
+    get gBrowser () {
+        return this.ownerWindow.gBrowser;
+    },
 
-	get groupItems () {
-		return this.ownerWindow.TabView._window.GroupItems;
-	},
+    get groupItems () {
+        return this.ownerWindow.TabView._window.GroupItems;
+    },
 
     getDefaultGroup : function () {
         let wId = WindowsManager.actions.getWindowId(this.ownerWindow);
@@ -424,7 +423,7 @@ this.TabsManager = {
                 id : saultedWId 
             });
         }
-        return  this.groupsMaps.get(saultedWId);	
+        return  this.groupsMaps.get(saultedWId);    
     },
 
     getSpecificGroup : function(lowLevelGroup = this.groupItems.getActiveGroupItem()){
@@ -443,8 +442,8 @@ this.TabsManager = {
                 tabsHolder : currentGroup.children,
                 get tabs  () { 
                     if (lowLevelGroup === self.lastActiveGroupItem){
-						return self.gBrowser.visibleTabs;
-					}
+                        return self.gBrowser.visibleTabs;
+                    }
 
                     // Works with tabs, that will be visible after group switching
                     let tabsArr = [];
@@ -465,35 +464,35 @@ this.TabsManager = {
         return  this.groupsMaps.get(saultedGId);
     },
 
-	get currentGroup () {
-		let winGr = null, groupGr = null;
+    get currentGroup () {
+        let winGr = null, groupGr = null;
         if (this.ownerWindow.TabView == null || this.ownerWindow.TabView._window == null) {
             return this.getDefaultGroup();
         }else{
             return this.getSpecificGroup();
-		}
-	},
+        }
+    },
 
-	get activeIndexToIdMap () {
+    get activeIndexToIdMap () {
         return this.groupsMaps.get(this.currentGroup.id).indexToIdMap;
-	},
-	
-	get activeIdToIndexMap () {
+    },
+    
+    get activeIdToIndexMap () {
         return this.groupsMaps.get(this.currentGroup.id).idToIndexMap;
-	},
-	
-	get visibleTabs() {
-		return this.gBrowser.visibleTabs;
-	},
-	
-	get countOfTabs() {
-		return this.visibleTabs.length;
-	},
+    },
+    
+    get visibleTabs() {
+        return this.gBrowser.visibleTabs;
+    },
+    
+    get countOfTabs() {
+        return this.visibleTabs.length;
+    },
 
-	_initData : function() {
+    _initData : function() {
         this.currentGroup.indexToIdMap = {};
         this.currentGroup.idToIndexMap = {};
-	},
+    },
 
     getCompleteInfoTable : function() {
         let dataArray = [];
@@ -502,7 +501,7 @@ this.TabsManager = {
             dataArray.push({groupId : T_GROUP + groupItem.id,
                     countOfTabs : groupItem.children.length,
                     title       : groupItem.defaultName,//});
-					thumbnail   : groupItem.canvas.toDataURL()});
+                    thumbnail   : groupItem.canvas.toDataURL()});
         }
         return {headers, dataArray};
     },
@@ -526,109 +525,109 @@ this.TabsManager = {
         }, TABVIEW_POLLING_TIME);
     },
 
-	doIndexIdRemaping : function(currentGroup = this.currentGroup){
-		// Dirrect access to map because of read/write ability
-		// Completely clean maps to avoid storing old values
+    doIndexIdRemaping : function(currentGroup = this.currentGroup){
+        // Dirrect access to map because of read/write ability
+        // Completely clean maps to avoid storing old values
         // FIX: Need to delete/add items correctly
         this._initData();
 
         var visibleTabs = currentGroup.tabs;
         var visibleLength = visibleTabs.length;
-		
-		var currentIndexToIdMap = currentGroup.indexToIdMap;
-		var currentIdToIndexMap = currentGroup.idToIndexMap;
+        
+        var currentIndexToIdMap = currentGroup.indexToIdMap;
+        var currentIdToIndexMap = currentGroup.idToIndexMap;
 
         for (index=1; index<=visibleLength; index++){
             let id=visibleTabs[index-1].linkedPanel;
             currentIndexToIdMap[index]=id; 
             currentIdToIndexMap[id]=index;
         }
-	},
+    },
 
-	removeTabFromMapsAt : function (tabIndex) {
-		let currentIndexToIdMap = this.groupsMaps.get(this.currentGroup.id).indexToIdMap;
-		let currentIdToIndexMap = this.groupsMaps.get(this.currentGroup.id).idToIndexMap;
-		let idToDelete = currentIndexToIdMap[index];
-		delete currentIndexToIdMap[index];
-		delete currentIdToIndexMap[idToDelete];
-	},
-	
-	removeTabFromMaps : function (tab) {
-		let index = this.getTabIndex(tab);
-		this.removeTabFromMapsAt(index);
-	},
+    removeTabFromMapsAt : function (tabIndex) {
+        let currentIndexToIdMap = this.groupsMaps.get(this.currentGroup.id).indexToIdMap;
+        let currentIdToIndexMap = this.groupsMaps.get(this.currentGroup.id).idToIndexMap;
+        let idToDelete = currentIndexToIdMap[index];
+        delete currentIndexToIdMap[index];
+        delete currentIdToIndexMap[idToDelete];
+    },
+    
+    removeTabFromMaps : function (tab) {
+        let index = this.getTabIndex(tab);
+        this.removeTabFromMapsAt(index);
+    },
 
-	addTabToMaps : function (tab) {
+    addTabToMaps : function (tab) {
         let currentIndexToIdMap = this.groupsMaps.get(this.currentGroup.id).indexToIdMap;
         let currentIdToIndexMap = this.groupsMaps.get(this.currentGroup.id).idToIndexMap;
         let id = tab.linkedPanel;
-		let index = this.gBrowser.visibleTabs.length;
-		currentIndexToIdMap[index]=id; 
-		currentIdToIndexMap[id]=index;
-	},
+        let index = this.gBrowser.visibleTabs.length;
+        currentIndexToIdMap[index]=id; 
+        currentIdToIndexMap[id]=index;
+    },
 
-	getTabAt : function(index, indexToIdMap = this.activeIndexToIdMap) {
-		let id = indexToIdMap[index];
-		let tab = tabs_utils.getTabForId(correctId(id));
-		return tab;
-	},
-	
-	getTabIndex : function(tab) {
-		//TODO: Add exception if there is no tabLabel
-		//		Do something with situattion, when label indexes became not up-to-date
-    	let tabLabel = tab.ownerDocument
-		   	.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
-		if(!tabLabel)
+    getTabAt : function(index, indexToIdMap = this.activeIndexToIdMap) {
+        let id = indexToIdMap[index];
+        let tab = tabs_utils.getTabForId(correctId(id));
+        return tab;
+    },
+    
+    getTabIndex : function(tab) {
+        //TODO: Add exception if there is no tabLabel
+        //      Do something with situattion, when label indexes became not up-to-date
+        let tabLabel = tab.ownerDocument
+            .getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
+        if(!tabLabel)
             throw "Specified tab has no indexes";
-		let index = tabLabel.getAttribute('value');
-		return index;
-	},
+        let index = tabLabel.getAttribute('value');
+        return index;
+    },
 
-	getCurrentTab : function() {
-		return this.gBrowser.selectedTab;
-	},
+    getCurrentTab : function() {
+        return this.gBrowser.selectedTab;
+    },
 
-	getCurrentTabIndex : function(){
-		let currentTab = this.gBrowser.selectedTab;
-		let index = this.activeIdToIndexMap[currentTab.linkedPanel];
-		let strIndex = index.toString();
-		return strIndex;
-	},
+    getCurrentTabIndex : function(){
+        let currentTab = this.gBrowser.selectedTab;
+        let index = this.activeIdToIndexMap[currentTab.linkedPanel];
+        let strIndex = index.toString();
+        return strIndex;
+    },
 
-	isLastTab : function(tab){
-		// Gecko solution
-		//  var isLastTab = (this.tabs.length - this._removingTabs.length == 1);
-		let tabs = this.gBrowser.visibleTabs;
-		let lastTab = tabs[tabs.length-1];
-		return (lastTab === tab);
-	},
+    isLastTab : function(tab){
+        // Gecko solution
+        //  var isLastTab = (this.tabs.length - this._removingTabs.length == 1);
+        let tabs = this.gBrowser.visibleTabs;
+        let lastTab = tabs[tabs.length-1];
+        return (lastTab === tab);
+    },
 
-	// Wrong naming, for nonevent situations "is" should be -> "isLastTab"
-	wasLastTab : function(tab){
-		// This way is event depndent -> tab should to fully created
-		return (tab.getAttribute('last-tab') == "true");
-	},
+    // Wrong naming, for nonevent situations "is" should be -> "isLastTab"
+    wasLastTab : function(tab){
+        // This way is event depndent -> tab should to fully created
+        return (tab.getAttribute('last-tab') == "true");
+    },
 
-	isCurrentTab : function(){
+    isCurrentTab : function(){
 
-	},
-	
-	goNextGroup : function(){
-	//TODO: Try to initFrame with tabView on firstCall
-		let gri = this.groupItems;
-		if (gri){
-			this.gBrowser.selectedTab = gri.getNextGroupItemTab(true).tab;
-		}
-	},
+    },
+    
+    goNextGroup : function(){
+    //TODO: Try to initFrame with tabView on firstCall
+        let gri = this.groupItems;
+        if (gri){
+            this.gBrowser.selectedTab = gri.getNextGroupItemTab(true).tab;
+        }
+    },
 
-	trackGroupChange : function (event) {
-		let tab = event.target;
+    trackGroupChange : function (event) {
+        let tab = event.target;
          if (tab._tabViewTabItem) {
             if (!this.lastActiveGroupItem) {
                 this.lastActiveGroupItem = this.ownerWindow.TabView._window.GroupItems.getActiveGroupItem();
             }
             if (this.lastActiveGroupItem != null 
-				&& tab._tabViewTabItem.parent != this.lastActiveGroupItem){
+                && tab._tabViewTabItem.parent != this.lastActiveGroupItem){
 
                 let group = this.getSpecificGroup(tab._tabViewTabItem.parent);
                 this.doIndexIdRemaping(group);
@@ -638,85 +637,85 @@ this.TabsManager = {
                 setBtnBadgeValue(groupStateBtn, this.ownerWindow, T_GROUP + group.id.charAt(0));
             }
         }
-	},
+    },
 
-	updateLabelsData : function () {
-		// console.log("caller is " + arguments.callee.caller.toString());
-		this.doIndexIdRemaping();
-		this.UIchanger.paintTabLabels();
-	},
-	
-	doOptimizedUpdateForClose : function(event){
-		let tab = event.target;
-		if (this.wasLastTab(tab)){
-			this.removeTabFromMaps(tab);
-		}else{
-			this.updateLabelsData();
-		}
-	},
-	
-	doOptimizedUpdateForOpen : function(event){
-		let tab = event.target;
-		if (this.isLastTab(tab)){
-			this.addTabToMaps(tab);
-			this.UIchanger.addLabel(tab);
-		}else{
-			this.updateLabelsData();
-		}
-	},
+    updateLabelsData : function () {
+        // console.log("caller is " + arguments.callee.caller.toString());
+        this.doIndexIdRemaping();
+        this.UIchanger.paintTabLabels();
+    },
+    
+    doOptimizedUpdateForClose : function(event){
+        let tab = event.target;
+        if (this.wasLastTab(tab)){
+            this.removeTabFromMaps(tab);
+        }else{
+            this.updateLabelsData();
+        }
+    },
+    
+    doOptimizedUpdateForOpen : function(event){
+        let tab = event.target;
+        if (this.isLastTab(tab)){
+            this.addTabToMaps(tab);
+            this.UIchanger.addLabel(tab);
+        }else{
+            this.updateLabelsData();
+        }
+    },
 
-	doOptimizedUpdateForMove : function(event){
-		
-	},
-	
-	actions : {
-		fixPinnedTabs : function(){
-			this.parent.gBrowser.tabContainer._positionPinnedTabs();
-		},
+    doOptimizedUpdateForMove : function(event){
+        
+    },
+    
+    actions : {
+        fixPinnedTabs : function(){
+            this.parent.gBrowser.tabContainer._positionPinnedTabs();
+        },
 
-		openTab : function(tabIndex, aParams){
-			let url = NEWTAB_URL;
+        openTab : function(tabIndex, aParams){
+            let url = NEWTAB_URL;
             // TODO: Stop TST service, move tab, enable TST service
             if ('TreeStyleTabService' in this.parent.ownerWindow)
                   this.parent.ownerWindow.TreeStyleTabService.readyToOpenChildTab(this.parent.gBrowser.selectedTab);
-			let newTab = this.parent.gBrowser.addTab(url, {skipAnimation:true});
+            let newTab = this.parent.gBrowser.addTab(url, {skipAnimation:true});
             // if ('TreeStyleTabService' in this.parent.ownerWindow)
             //     this.parent.ownerWindow.gBrowser.treeStyleTab.moveTabs([newTab], this.parent.getCurrentTab());
-			this.parent.gBrowser.moveTabTo(newTab, --tabIndex);
-			this.parent.gBrowser.selectedTab = newTab;
-		},
+            this.parent.gBrowser.moveTabTo(newTab, --tabIndex);
+            this.parent.gBrowser.selectedTab = newTab;
+        },
 
-		closeTab : function(tabIndex, aParams){
-			let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
-			this.parent.gBrowser.removeTab(tab, {animate:false});
-		},
+        closeTab : function(tabIndex, aParams){
+            let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
+            this.parent.gBrowser.removeTab(tab, {animate:false});
+        },
 
-		reloadTab : function(tabIndex, aParams){
-			let tab = this.parent.getTabAt(tabIndex);
-			this.parent.gBrowser.reloadTab(tab);
-		},
+        reloadTab : function(tabIndex, aParams){
+            let tab = this.parent.getTabAt(tabIndex);
+            this.parent.gBrowser.reloadTab(tab);
+        },
 
-		stopLoadingTab : function(tabIndex, aParams){
-			let tab = this.parent.getTabAt(tabIndex);
-			this.parent.gBrowser.getBrowserForTab(tab).stop();
-		},
+        stopLoadingTab : function(tabIndex, aParams){
+            let tab = this.parent.getTabAt(tabIndex);
+            this.parent.gBrowser.getBrowserForTab(tab).stop();
+        },
 
-		getRootURI : function(tab){
-			let tabURI = tab.linkedBrowser.currentURI;
-			if (tabURI.asciiHost == "")
-				return tabURI.asciiSpec;
-			else
-				return tabURI.host;	
-		},
+        getRootURI : function(tab){
+            let tabURI = tab.linkedBrowser.currentURI;
+            if (tabURI.asciiHost == "")
+                return tabURI.asciiSpec;
+            else
+                return tabURI.host; 
+        },
 
-		//TODO: fix tab reordering on move - each tab tries to be near the targetIndex
-		moveTab : function(tabIndex, aParams){
-			let indexIdMap = aParams.mapCopy;
-			let behavior = aParams.placing.behavior;
-			let placeIndex = aParams.placing.placeIndex;
+        //TODO: fix tab reordering on move - each tab tries to be near the targetIndex
+        moveTab : function(tabIndex, aParams){
+            let indexIdMap = aParams.mapCopy;
+            let behavior = aParams.placing.behavior;
+            let placeIndex = aParams.placing.placeIndex;
 
-			let idToMove = indexIdMap[tabIndex];
-			let tabToMove = tabs_utils.getTabForId(correctId(idToMove));
+            let idToMove = indexIdMap[tabIndex];
+            let tabToMove = tabs_utils.getTabForId(correctId(idToMove));
 
             // Tab specific placement
             if ([DELIM_PLACE_AT, DELIM_PLACE_BEFORE, DELIM_PLACE_AFTER].includes(behavior)){
@@ -748,102 +747,102 @@ this.TabsManager = {
                     window.gBrowser.selectedTab = newTab;
                     break;
             }
-		},
+        },
 
-		switchToTab : function(tabIndex, aParams){
-			let tab = this.parent.getTabAt(tabIndex);
-			let window = tabs_utils.getOwnerWindow(tab);
-			tabs_utils.activateTab(tab, window);
-		},
+        switchToTab : function(tabIndex, aParams){
+            let tab = this.parent.getTabAt(tabIndex);
+            let window = tabs_utils.getOwnerWindow(tab);
+            tabs_utils.activateTab(tab, window);
+        },
 
-		tooglePinning : function(tabIndex, aParams){
-			let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
-			if (!tab.pinned)
-				this.parent.gBrowser.pinTab(tab);
-			else
-				this.parent.gBrowser.unpinTab(tab);
-		},
+        tooglePinning : function(tabIndex, aParams){
+            let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
+            if (!tab.pinned)
+                this.parent.gBrowser.pinTab(tab);
+            else
+                this.parent.gBrowser.unpinTab(tab);
+        },
 
-		bookmarkTab : function(tabIndex, aParams){
+        bookmarkTab : function(tabIndex, aParams){
 
-			function searchFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder){
-				let options = historyService.getNewQueryOptions();
-				let query = historyService.getNewQuery();
+            function searchFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder){
+                let options = historyService.getNewQueryOptions();
+                let query = historyService.getNewQuery();
 
-				query.setFolders([parentFolder],1);
-				options.excludeItems = true;
+                query.setFolders([parentFolder],1);
+                options.excludeItems = true;
 
-				let result = historyService.executeQuery(query, options);
-				let rootNode = result.root;
-				rootNode.containerOpen = true;
+                let result = historyService.executeQuery(query, options);
+                let rootNode = result.root;
+                rootNode.containerOpen = true;
 
-				for (let i = 0; i < rootNode.childCount; i ++) {
-					let node = rootNode.getChild(i);
-				
-					if (node.title === title){
-						rootNode.containerOpen = false; 
-						return node.itemId;
-					}
-				}
-				rootNode.containerOpen = false; 
-				return null;
-			}
-
-			function createFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder){
-			    let folderId = bookmarksService.createFolder(
-					parentFolder, 
-					title,       
-					bookmarksService.DEFAULT_INDEX);    
-				return folderId;
-			}
-
-			aParams.path = aParams.path || {valueArray: []};
-            let folderTitles = aParams.path.valueArray.slice();
-
-			let title = folderTitles.shift();
-			let parentFolder = bookmarksService.unfiledBookmarksFolder;
-			
-			// Should be len + 1 because of shifted first value
-			let length  = folderTitles.length + 1;
-
-			// Search for last existing folder and get its id
-			for (let i=1; i <= length; i++){ 
-				let folderId = searchFolder(title, parentFolder);
-				if (folderId == null)
-					break;
-				parentFolder = folderId;
-				title = folderTitles.shift();
-			}
-
-			let pasteFolder;
-			if (title == undefined) // if all needed folders exists
-				pasteFolder = parentFolder; 
-			else
-				pasteFolder = createFolder(title, parentFolder); // create folder for shifted title
-
-            length = folderTitles.length;
-			
-			// Create all non existing folders with last existing folder as parent
-            for (let i=1; i <= length; i++){ 
-				pasteFolder = createFolder(folderTitles.shift(), pasteFolder);
+                for (let i = 0; i < rootNode.childCount; i ++) {
+                    let node = rootNode.getChild(i);
+                
+                    if (node.title === title){
+                        rootNode.containerOpen = false; 
+                        return node.itemId;
+                    }
+                }
+                rootNode.containerOpen = false; 
+                return null;
             }
 
-			let indexIdMap = aParams.mapCopy;
-			let id = indexIdMap[tabIndex];
-			let tab = tabs_utils.getTabForId(correctId(id));
-			let tTitle = tabs_utils.getTabTitle(tab);
-			let tURL = tabs_utils.getTabURL(tab);
+            function createFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder){
+                let folderId = bookmarksService.createFolder(
+                    parentFolder, 
+                    title,       
+                    bookmarksService.DEFAULT_INDEX);    
+                return folderId;
+            }
 
-			// Create tab bookmark
-			var bookmarkURI = IOService.newURI(tURL, null, null);
-			var bookmarkId = bookmarksService.insertBookmark(
-				pasteFolder,
-				bookmarkURI,             
-				bookmarksService.DEFAULT_INDEX, 
-				tTitle);    
+            aParams.path = aParams.path || {valueArray: []};
+            let folderTitles = aParams.path.valueArray.slice();
 
-			// Working solution, but SDK does not allow to add bookmarks to nondefault folders 
-			//
+            let title = folderTitles.shift();
+            let parentFolder = bookmarksService.unfiledBookmarksFolder;
+            
+            // Should be len + 1 because of shifted first value
+            let length  = folderTitles.length + 1;
+
+            // Search for last existing folder and get its id
+            for (let i=1; i <= length; i++){ 
+                let folderId = searchFolder(title, parentFolder);
+                if (folderId == null)
+                    break;
+                parentFolder = folderId;
+                title = folderTitles.shift();
+            }
+
+            let pasteFolder;
+            if (title == undefined) // if all needed folders exists
+                pasteFolder = parentFolder; 
+            else
+                pasteFolder = createFolder(title, parentFolder); // create folder for shifted title
+
+            length = folderTitles.length;
+            
+            // Create all non existing folders with last existing folder as parent
+            for (let i=1; i <= length; i++){ 
+                pasteFolder = createFolder(folderTitles.shift(), pasteFolder);
+            }
+
+            let indexIdMap = aParams.mapCopy;
+            let id = indexIdMap[tabIndex];
+            let tab = tabs_utils.getTabForId(correctId(id));
+            let tTitle = tabs_utils.getTabTitle(tab);
+            let tURL = tabs_utils.getTabURL(tab);
+
+            // Create tab bookmark
+            var bookmarkURI = IOService.newURI(tURL, null, null);
+            var bookmarkId = bookmarksService.insertBookmark(
+                pasteFolder,
+                bookmarkURI,             
+                bookmarksService.DEFAULT_INDEX, 
+                tTitle);    
+
+            // Working solution, but SDK does not allow to add bookmarks to nondefault folders 
+            //
             // let groupTitles = aParams.path.valueArray.slice();
             // let topGroup = Group({title: groupTitles.shift()});
             // 
@@ -851,78 +850,78 @@ this.TabsManager = {
             // for (let i=1; i <= length; i++){ // From the end
             //     topGroup = Group({title:groupTitles.shift(), group:topGroup});
             // }
-			// let indexIdMap = aParams.mapCopy;
-			// let id = indexIdMap[tabIndex];
-			// let tab = tabs_utils.getTabForId(correctId(id));
-			// let tTitle = tabs_utils.getTabTitle(tab);
-			// let tURL = tabs_utils.getTabURL(tab);
-			// let bookmark = Bookmark({ title: tTitle, url: tURL, group:topGroup });
-			// let emitter = save(bookmark);
+            // let indexIdMap = aParams.mapCopy;
+            // let id = indexIdMap[tabIndex];
+            // let tab = tabs_utils.getTabForId(correctId(id));
+            // let tTitle = tabs_utils.getTabTitle(tab);
+            // let tURL = tabs_utils.getTabURL(tab);
+            // let bookmark = Bookmark({ title: tTitle, url: tURL, group:topGroup });
+            // let emitter = save(bookmark);
             // 
-			// emitter.on("data", function (saved, inputItem) {
-			//   console.log(saved.title === inputItem.title); // true
-			//   console.log(saved !== inputItem); // true
-			//   console.log(inputItem === bookmark); // true
-			// }).on("end", function (savedItems, inputItems) {
-			// });
-		},
+            // emitter.on("data", function (saved, inputItem) {
+            //   console.log(saved.title === inputItem.title); // true
+            //   console.log(saved !== inputItem); // true
+            //   console.log(inputItem === bookmark); // true
+            // }).on("end", function (savedItems, inputItems) {
+            // });
+        },
 
-		changeGroupAt : function(id){
-			// 	if(!Tabs.hasHidden()) { return; }
-			// ui.setActive(gri._items.get(2))
-			let numberId = parseInt(id);
+        changeGroupAt : function(id){
+            //  if(!Tabs.hasHidden()) { return; }
+            // ui.setActive(gri._items.get(2))
+            let numberId = parseInt(id);
             this.parent.ownerWindow.TabView._window.UI.goToTab(
                 this.parent.groupItems._items.get(numberId)
-                .getActiveTab().tab);	
-			// ========
-			// this.parent.ownerWindow.TabView._window.UI.setActive(this.parent.groupItems._items.get(numberId));
-			// this.parent.ownerWindow.gBrowser.selectedTab = this.parent.groupItems._items.get(numberId)
-			//     .getActiveTab().tab;
-			// let tab = this.parent.groupItems._items.get(numberId).getActiveTab().tab;
-			// this.parent.groupItems.updateActiveGroupItemAndTabBar(tab);
-			// this.parent.groupItems._items.get(numberId).zoomIn();
-			//
-			//     switchGroup: function(aPrevious) {
-			//     if(!Tabs.hasHidden()) { return; }
+                .getActiveTab().tab);   
+            // ========
+            // this.parent.ownerWindow.TabView._window.UI.setActive(this.parent.groupItems._items.get(numberId));
+            // this.parent.ownerWindow.gBrowser.selectedTab = this.parent.groupItems._items.get(numberId)
+            //     .getActiveTab().tab;
+            // let tab = this.parent.groupItems._items.get(numberId).getActiveTab().tab;
+            // this.parent.groupItems.updateActiveGroupItemAndTabBar(tab);
+            // this.parent.groupItems._items.get(numberId).zoomIn();
+            //
+            //     switchGroup: function(aPrevious) {
+            //     if(!Tabs.hasHidden()) { return; }
             // 
-			//     this._initFrame(() => {
-			//         let groupItems = this._window[objName].GroupItems;
-			//         let tabItem = groupItems.getNextGroupItemTab(aPrevious);
-			//         if(!tabItem) { return; }
+            //     this._initFrame(() => {
+            //         let groupItems = this._window[objName].GroupItems;
+            //         let tabItem = groupItems.getNextGroupItemTab(aPrevious);
+            //         if(!tabItem) { return; }
             // 
-			//         let isVisible = this.isVisible();
-			//         if(Tabs.selected.pinned || isVisible) {
-			//             groupItems.updateActiveGroupItemAndTabBar(tabItem, { dontSetActiveTabInGroup: !isVisible });
-			//         } else {
-			//             Tabs.selected = tabItem.tab;
-			//         }
-			//     });
-			// },
-			// let ui = this.parent.ownerWindow.TabView._window.UI;
-			// let gi = this.parent.groupItems._items.get(numberId);
-			// ui.setActive(gi);
-			// let tab = gi.getActiveTab().tab;
-			// ui.goToTab(tab);
-			
-		},
-		
-		changeGroupByName : function(name){
-			
+            //         let isVisible = this.isVisible();
+            //         if(Tabs.selected.pinned || isVisible) {
+            //             groupItems.updateActiveGroupItemAndTabBar(tabItem, { dontSetActiveTabInGroup: !isVisible });
+            //         } else {
+            //             Tabs.selected = tabItem.tab;
+            //         }
+            //     });
+            // },
+            // let ui = this.parent.ownerWindow.TabView._window.UI;
+            // let gi = this.parent.groupItems._items.get(numberId);
+            // ui.setActive(gi);
+            // let tab = gi.getActiveTab().tab;
+            // ui.goToTab(tab);
+            
+        },
+        
+        changeGroupByName : function(name){
+            
 
-		},
+        },
 
-		createGroup : function(name){
-			let groupItem = this.parent.groupItems.newGroup();
-			// groupItem.setTitle("G" + groupItem.id + " : " + name);
-			groupItem.newTab(NEWTAB_URL);
-		},
-		
-		closeGroup : function(id){
-			let numberId = parseInt(id);
-			this.parent.groupItems._items.get(numberId).close();
+        createGroup : function(name){
+            let groupItem = this.parent.groupItems.newGroup();
+            // groupItem.setTitle("G" + groupItem.id + " : " + name);
+            groupItem.newTab(NEWTAB_URL);
+        },
+        
+        closeGroup : function(id){
+            let numberId = parseInt(id);
+            this.parent.groupItems._items.get(numberId).close();
             // TODO: Remove current group from map 
             // TODO: Add tab remove group closing listeners
-		},
+        },
 
         searchTabByTitle : function(target, aParams){
             let title = aParams.path.valueArray[0];
@@ -937,11 +936,11 @@ this.TabsManager = {
             console.log(_returnArr.toSource());
             return _returnArr;
         }
-		
-	},
+        
+    },
 
-	events : {
-		isSubscripted : false,
+    events : {
+        isSubscripted : false,
         examinedEvents : ["TabSelect",
                             "TabMove",
                             "TabPinned",
@@ -950,7 +949,7 @@ this.TabsManager = {
                             "TabOpen"],
         handleEvent : function(event){
                 // TODO: OnMove update just indexes between currentTabIndex
-                //			to the futureTabIndex
+                //          to the futureTabIndex
                 // TODO: Add data removal from maps on TabClose
             switch (event.type){
                 case "TabSelect" :
@@ -969,10 +968,10 @@ this.TabsManager = {
                     break;
             }
         },
-		subscribeTabEvents : function(){
+        subscribeTabEvents : function(){
             if (!this.tabViewPollingFinished)
                 this.parent.pollForTabView();
-			if (!this.isSubscripted){
+            if (!this.isSubscripted){
                 this.examinedEvents.forEach(event => {
                         this.parent.ownerWindow.gBrowser.tabContainer.addEventListener(
                                 event,
@@ -980,25 +979,25 @@ this.TabsManager = {
                                 false);
                 });
                 this.isSubscripted = true;
-			}
-		},
-		
-		unsubscribeTabEvents : function(){
-			if (this.isSubscripted){
+            }
+        },
+        
+        unsubscribeTabEvents : function(){
+            if (this.isSubscripted){
                 this.examinedEvents.forEach(event => {
                         this.parent.ownerWindow.gBrowser.tabContainer.removeEventListener(
                                 event,
                                 this,
                                 false);
                 });
-				this.isSubscripted = false;
-			}
-		}	
-	},
+                this.isSubscripted = false;
+            }
+        }   
+    },
 
-	dataParser : {
-		parseAndExecute : function(cmd){
-			let doAction = {};
+    dataParser : {
+        parseAndExecute : function(cmd){
+            let doAction = {};
             let oneStepCommand = true;
 
             let action = this.isNumber(cmd.charAt(0)) ? ACTION_GOTO_T : cmd.charAt(0);
@@ -1074,7 +1073,7 @@ this.TabsManager = {
             if (excluding){
                 target = target.slice(0, target.indexOf(DELIM_EXCLUDING + excluding.rawData)); // We extracted "!" before
             }
-            let placing = this.hasPlacing(target);		// m25a5 -> a5 is placing
+            let placing = this.hasPlacing(target);      // m25a5 -> a5 is placing
             if (placing && action == ACTION_MOVE){
                 target = target.slice(0, target.indexOf(placing.rawData));
             }
@@ -1146,9 +1145,9 @@ this.TabsManager = {
                 let valueType = this.getArgumentType(value);
                 try{
                     switch(valueType){
-                        case T_NUMBER 	: doAction.forTab(value, aParams); break;
-                        case T_GROUP	: doAction.forGroup(value.replace("g",''), aParams); break;
-                        case T_WINDOW	: doAction.forWindow(value.replace("w",''), aParams); break;
+                        case T_NUMBER   : doAction.forTab(value, aParams); break;
+                        case T_GROUP    : doAction.forGroup(value.replace("g",''), aParams); break;
+                        case T_WINDOW   : doAction.forWindow(value.replace("w",''), aParams); break;
                         default: execMsg = "Unknown target error: " + value; execState = EXEC_ERROR;
                     }
                 }catch (err) {
@@ -1162,7 +1161,7 @@ this.TabsManager = {
                     this.parent.updateLabelsData();
                     this.parent.commandsHistory.push({command:cmd, 
                                                         executionState:execState, 
-                                                        executionMsg:execMsg});	
+                                                        executionMsg:execMsg}); 
                     if (oneStepCommand && execState === EXEC_OK)
                         commandsPopup.port.emit("task-completed");
                     else
@@ -1196,30 +1195,30 @@ this.TabsManager = {
             // 
             // this.parent.commandsHistory.push({command:cmd, 
             //                                     executionState:execState, 
-            //                                     executionMsg:execMsg});	
+            //                                     executionMsg:execMsg});  
             // if (oneStepCommand && execState === EXEC_OK)
             //     commandsPopup.port.emit("task-completed");
             // else
             //     commandsPopup.port.emit("historyData-arrived", this.parent.commandsHistory);
-		},
+        },
 
-		getArgumentType : function(arg){
-			if (this.isNumber(arg)) return T_NUMBER;
-			if (arg.charAt(0) == "g") return T_GROUP;
-			if (arg.charAt(0) == "w") return T_WINDOW;
-			return null;
-		},
+        getArgumentType : function(arg){
+            if (this.isNumber(arg)) return T_NUMBER;
+            if (arg.charAt(0) == "g") return T_GROUP;
+            if (arg.charAt(0) == "w") return T_WINDOW;
+            return null;
+        },
 
-		//== Multiple targets functions =================================
-		extractRangeValues : function(range){
-    		const rBegin = 0;
-    		const rEnd = 1;
-			let valueArr = [];
+        //== Multiple targets functions =================================
+        extractRangeValues : function(range){
+            const rBegin = 0;
+            const rEnd = 1;
+            let valueArr = [];
             let prefix = "";
             let startValue,
                 endValue;
-    		console.log("In ProccedRange func");
-			
+            console.log("In ProccedRange func");
+            
             if (range[rBegin].charAt(0) == "g" && range[rBegin].charAt(0) == "g"){
                 // Extract "g" classifier
                 range[rBegin] = range[rBegin].replace("g", "");
@@ -1249,61 +1248,61 @@ this.TabsManager = {
                     endValue = this.parent.countOfTabs;
             }
             
-			// Provide "e"nd functionality
-			// x-e -> close tabs from current to the end; xe- -> the same
-			if (range[rBegin] == "e")
-				range[rBegin] = endValue;
-			if (range[rEnd] == "e")
-				range[rEnd] = endValue; 
+            // Provide "e"nd functionality
+            // x-e -> close tabs from current to the end; xe- -> the same
+            if (range[rBegin] == "e")
+                range[rBegin] = endValue;
+            if (range[rEnd] == "e")
+                range[rEnd] = endValue; 
 
-			// Provide currentTab ranges; 
-			//	x-15 -> close from current to 15th tab, x5- -> close from 5th to current etc
-			if (range[rBegin] == "" || range[rEnd] == ""){
-				// let index = this.parent.getCurrentTabIndex();
+            // Provide currentTab ranges; 
+            //  x-15 -> close from current to 15th tab, x5- -> close from 5th to current etc
+            if (range[rBegin] == "" || range[rEnd] == ""){
+                // let index = this.parent.getCurrentTabIndex();
                 let index = beginValue; 
-				if(range[rBegin] == "" )
-					range[rBegin] = index;
-				else
-					range[rEnd] = index;	
-				console.log("Extend empty range with index:" + index);
-			}
+                if(range[rBegin] == "" )
+                    range[rBegin] = index;
+                else
+                    range[rEnd] = index;    
+                console.log("Extend empty range with index:" + index);
+            }
 
-			// Provide reverse ranges 150-12, e-15 etc
-			if (Number(range[rBegin]) > Number(range[rEnd])){
-				[ range[rBegin], range[rEnd] ] = [ range[rEnd], range[rBegin] ]; 
-			}
-    		console.log("so range[B]=" + range[rBegin] + " and range[E]=" + range[rEnd]);
+            // Provide reverse ranges 150-12, e-15 etc
+            if (Number(range[rBegin]) > Number(range[rEnd])){
+                [ range[rBegin], range[rEnd] ] = [ range[rEnd], range[rBegin] ]; 
+            }
+            console.log("so range[B]=" + range[rBegin] + " and range[E]=" + range[rEnd]);
             // TODO: Fix group numeration bug: we work with native groups ID, 
-			//			so definately there will be
+            //          so definately there will be
             //      id skipping -> 3,4,5,7. In such case we cannt simply inc 
-			//			counter, need to iterate through
+            //          counter, need to iterate through
             // TODO: Add panel groupView update on group clossing?
-    		// Number-Number - is temp fix, need to do some with chars/numbers scenarios
-    		for (let targetIndex = range[rBegin]; Number(targetIndex) <= Number(range[rEnd]); targetIndex++){
-        		console.log("In changed range loop, range part id :" + targetIndex); 
-				valueArr.push(prefix + targetIndex.toString());
-    		}
-			return valueArr;
-		},
+            // Number-Number - is temp fix, need to do some with chars/numbers scenarios
+            for (let targetIndex = range[rBegin]; Number(targetIndex) <= Number(range[rEnd]); targetIndex++){
+                console.log("In changed range loop, range part id :" + targetIndex); 
+                valueArr.push(prefix + targetIndex.toString());
+            }
+            return valueArr;
+        },
 
 
-		extractHostValues : function(str){
-			console.log("=======================");
-			console.log("Argumebbt str:" + str + " and str.length:" + str.length);
-			let hostToAct = (str == "") ? this.parent.actions.getRootURI(this.parent.getCurrentTab()) : str;
-			console.log("	after repair, hostToAct:" + hostToAct);
+        extractHostValues : function(str){
+            console.log("=======================");
+            console.log("Argumebbt str:" + str + " and str.length:" + str.length);
+            let hostToAct = (str == "") ? this.parent.actions.getRootURI(this.parent.getCurrentTab()) : str;
+            console.log("   after repair, hostToAct:" + hostToAct);
 
-			let tabs = this.parent.visibleTabs;
-			let indexesToAct = [];
-			for (let tab of tabs){
-				tabAddr = this.parent.actions.getRootURI(tab);
-				if (tabAddr == hostToAct){
-					let id = tab.linkedPanel;
-					indexesToAct.push(this.parent.activeIdToIndexMap[id].toString());
-				}
-			}
-			return indexesToAct;
-		},
+            let tabs = this.parent.visibleTabs;
+            let indexesToAct = [];
+            for (let tab of tabs){
+                tabAddr = this.parent.actions.getRootURI(tab);
+                if (tabAddr == hostToAct){
+                    let id = tab.linkedPanel;
+                    indexesToAct.push(this.parent.activeIdToIndexMap[id].toString());
+                }
+            }
+            return indexesToAct;
+        },
 
         extractTitleValues : function(arg){
             let lookingWords = arg.valueArray;
@@ -1326,209 +1325,209 @@ this.TabsManager = {
         },
 
 
-		//=== has[a] ============================================================
-		hasSeveralValues : function(arg){
-			let splited = arg.split(DELIM_SEVERVALS);
-			return splited.length > 1 ? splited : null; 
-		},
+        //=== has[a] ============================================================
+        hasSeveralValues : function(arg){
+            let splited = arg.split(DELIM_SEVERVALS);
+            return splited.length > 1 ? splited : null; 
+        },
 
-		// "b123,24,53/someDir/subdir/level3dir/dir with space/ ==== dir name ===/'wrongData'123,145"
-		hasPath : function(arg){
-			let pBegin = arg.indexOf(DELIM_PATH);
-			let pEnd = arg.lastIndexOf(DELIM_PATH);
-			if (pBegin != -1 && pEnd != -1 && pBegin != pEnd){
-				let _rawData = arg.slice(pBegin, pEnd+1);
-				let _pathArray = arg.slice(pBegin + 1, pEnd).split(DELIM_PATH);
-				return { rawData : _rawData
-						,valueArray : _pathArray};
-			}
-			return null;
-		},
+        // "b123,24,53/someDir/subdir/level3dir/dir with space/ ==== dir name ===/'wrongData'123,145"
+        hasPath : function(arg){
+            let pBegin = arg.indexOf(DELIM_PATH);
+            let pEnd = arg.lastIndexOf(DELIM_PATH);
+            if (pBegin != -1 && pEnd != -1 && pBegin != pEnd){
+                let _rawData = arg.slice(pBegin, pEnd+1);
+                let _pathArray = arg.slice(pBegin + 1, pEnd).split(DELIM_PATH);
+                return { rawData : _rawData
+                        ,valueArray : _pathArray};
+            }
+            return null;
+        },
 
         // FIX: mg5w3 - will not work in parser.Anyway, there is no such func event in TabGroups
-		hasPlacing : function(arg){
-			// Extract all host data like "example.com", "" to avoid conflicts with a,b,g places
-			let quotationSplitting = arg.split(/"((?:\\.|[^"\\])*)"/);
-			let possiblePlacing = quotationSplitting[quotationSplitting.length-1];
-			
-			if	(possiblePlacing.split(/[@abgw]/).length > 1){
-				let len = possiblePlacing.length;
-				let placementAt = possiblePlacing.indexOf(DELIM_PLACE_AT);
-				let placementAfter = possiblePlacing.indexOf(DELIM_PLACE_AFTER);
-				let placementBefore = possiblePlacing.indexOf(DELIM_PLACE_BEFORE);
-				let placementInGroup = possiblePlacing.indexOf(DELIM_PLACE_GROUP);
-				let placementInWindow = possiblePlacing.indexOf(DELIM_PLACE_WINDOW);
+        hasPlacing : function(arg){
+            // Extract all host data like "example.com", "" to avoid conflicts with a,b,g places
+            let quotationSplitting = arg.split(/"((?:\\.|[^"\\])*)"/);
+            let possiblePlacing = quotationSplitting[quotationSplitting.length-1];
+            
+            if  (possiblePlacing.split(/[@abgw]/).length > 1){
+                let len = possiblePlacing.length;
+                let placementAt = possiblePlacing.indexOf(DELIM_PLACE_AT);
+                let placementAfter = possiblePlacing.indexOf(DELIM_PLACE_AFTER);
+                let placementBefore = possiblePlacing.indexOf(DELIM_PLACE_BEFORE);
+                let placementInGroup = possiblePlacing.indexOf(DELIM_PLACE_GROUP);
+                let placementInWindow = possiblePlacing.indexOf(DELIM_PLACE_WINDOW);
 
-				let _rawData;
-				if (placementAt != -1) _rawData = possiblePlacing.slice(placementAt, len);
-				if (placementAfter != -1) _rawData = possiblePlacing.slice(placementAfter, len);
-				if (placementBefore != -1) _rawData = possiblePlacing.slice(placementBefore, len);
-				if (placementInGroup != -1) _rawData = possiblePlacing.slice(placementInGroup, len);
-				if (placementInWindow != -1) _rawData = possiblePlacing.slice(placementInWindow, len);
-			
-				let _behavior = _rawData.charAt(0);
-				let _placeIndex = _rawData.slice(1, _rawData.length);
-				if (_placeIndex == "e")
-					_placeIndex = this.parent.countOfTabs;
-				console.log("In hasPlacing, placing:" + _rawData);
-				console.log("	placeIndex:" + _placeIndex);
-				console.log("	tabToPlace:" + _placeIndex);
-				return { rawData : _rawData
-						,behavior : _behavior 
-						,placeIndex : _placeIndex}; 
-			}
-			return null;
-		},
+                let _rawData;
+                if (placementAt != -1) _rawData = possiblePlacing.slice(placementAt, len);
+                if (placementAfter != -1) _rawData = possiblePlacing.slice(placementAfter, len);
+                if (placementBefore != -1) _rawData = possiblePlacing.slice(placementBefore, len);
+                if (placementInGroup != -1) _rawData = possiblePlacing.slice(placementInGroup, len);
+                if (placementInWindow != -1) _rawData = possiblePlacing.slice(placementInWindow, len);
+            
+                let _behavior = _rawData.charAt(0);
+                let _placeIndex = _rawData.slice(1, _rawData.length);
+                if (_placeIndex == "e")
+                    _placeIndex = this.parent.countOfTabs;
+                console.log("In hasPlacing, placing:" + _rawData);
+                console.log("   placeIndex:" + _placeIndex);
+                console.log("   tabToPlace:" + _placeIndex);
+                return { rawData : _rawData
+                        ,behavior : _behavior 
+                        ,placeIndex : _placeIndex}; 
+            }
+            return null;
+        },
 
         // Should be recursive?
-		getSimplifiedArray : function(value){
-			let _target = value;
-			let _valueArr = [];
-			let sv = this.hasSeveralValues(_target);
-			let rg = this.isRange(_target);
-			let sd = this.hasHostData(_target);
-			let td = this.hasTitleData(_target);
-			if (sv){
-				for (let value of sv){
-					let rg = this.isRange(value);
-					let sd = this.hasHostData(value);
+        getSimplifiedArray : function(value){
+            let _target = value;
+            let _valueArr = [];
+            let sv = this.hasSeveralValues(_target);
+            let rg = this.isRange(_target);
+            let sd = this.hasHostData(_target);
+            let td = this.hasTitleData(_target);
+            if (sv){
+                for (let value of sv){
+                    let rg = this.isRange(value);
+                    let sd = this.hasHostData(value);
                     let td = this.hasTitleData(value);
-					if(rg){
-						_valueArr.push(...this.extractRangeValues(rg));
-					}else if (sd != null && (sd == "" || sd.length > 0)){
-						_valueArr.push(...this.extractHostValues(sd));
+                    if(rg){
+                        _valueArr.push(...this.extractRangeValues(rg));
+                    }else if (sd != null && (sd == "" || sd.length > 0)){
+                        _valueArr.push(...this.extractHostValues(sd));
                     }else if (td){
                         _valueArr.push(...this.extractTitleValues(td));
-					}else{ 
-						_valueArr.push(value);	
-					}
-				}
-			}else if (rg) {
-				_valueArr.push(...this.extractRangeValues(rg));
-			}else if (sd != null && (sd == "" || sd.length > 0)){
-				_valueArr.push(...this.extractHostValues(sd));
+                    }else{ 
+                        _valueArr.push(value);  
+                    }
+                }
+            }else if (rg) {
+                _valueArr.push(...this.extractRangeValues(rg));
+            }else if (sd != null && (sd == "" || sd.length > 0)){
+                _valueArr.push(...this.extractHostValues(sd));
             }else if (td) {
                 _valueArr.push(...this.extractTitleValues(td));
-			}else{
-				if (_target == "")
-					_target = this.parent.getCurrentTabIndex();
-				_valueArr.push(_target);
-			}
-			return _valueArr;
-		},
+            }else{
+                if (_target == "")
+                    _target = this.parent.getCurrentTabIndex();
+                _valueArr.push(_target);
+            }
+            return _valueArr;
+        },
 
-		hasExcludeList : function(arg){
-			console.log("In hasExclude list");
-			let _arr;
-			let splitResult = arg.split(DELIM_EXCLUDING);
-			if (splitResult.length > 1){
-				let _target = splitResult[1];
-				_arr = this.getSimplifiedArray(_target);
-				console.log("	and wanna return _arr:" + _arr);
-				return { rawData : _target 
-						,valueArray : _arr};
-			}else{
-				return null;
-			}
-		},
+        hasExcludeList : function(arg){
+            console.log("In hasExclude list");
+            let _arr;
+            let splitResult = arg.split(DELIM_EXCLUDING);
+            if (splitResult.length > 1){
+                let _target = splitResult[1];
+                _arr = this.getSimplifiedArray(_target);
+                console.log("   and wanna return _arr:" + _arr);
+                return { rawData : _target 
+                        ,valueArray : _arr};
+            }else{
+                return null;
+            }
+        },
 
-		hasHostData : function(arg){
-			console.log("In hasHostData, arg is :" + arg);
-			let results = arg.split('"');
-			console.log("In is hasHostData " + results);
-			console.log("	and results.length=" + results.length);
-			if (results.length > 2){
-				let possibleHost = results[1];
-				let possibleIndexOfHost = (results[0] == "") ? results[2] : results[0]; //9"" or ""9
-				if (possibleHost == "" 
-					&& possibleIndexOfHost != "" 
-					&& this.isNumber(possibleIndexOfHost)){
-						let tab = this.parent.getTabAt(possibleIndexOfHost);
-						return this.parent.actions.getRootURI(tab);
-				}
-				return possibleHost;
-			}
-			return null;
-		},
+        hasHostData : function(arg){
+            console.log("In hasHostData, arg is :" + arg);
+            let results = arg.split('"');
+            console.log("In is hasHostData " + results);
+            console.log("   and results.length=" + results.length);
+            if (results.length > 2){
+                let possibleHost = results[1];
+                let possibleIndexOfHost = (results[0] == "") ? results[2] : results[0]; //9"" or ""9
+                if (possibleHost == "" 
+                    && possibleIndexOfHost != "" 
+                    && this.isNumber(possibleIndexOfHost)){
+                        let tab = this.parent.getTabAt(possibleIndexOfHost);
+                        return this.parent.actions.getRootURI(tab);
+                }
+                return possibleHost;
+            }
+            return null;
+        },
 
-		hasTitleData : function(arg){
+        hasTitleData : function(arg){
             console.log("In hasTitleWord, arg is:" + arg);
-			
-			let tBegin = arg.indexOf(DELIM_TITLE_LEFT);
-			let tEnd = arg.indexOf(DELIM_TITLE_RIGHT);
-			if (tBegin != -1 && tEnd != -1 && tBegin != tEnd){
-				let _rawData = arg.slice(tBegin, tEnd+1);
-				let _pathArray = arg.slice(tBegin + 1, tEnd).split(DELIM_AND_CONDITION);
-				return { rawData : _rawData
-						,valueArray : _pathArray};
-			}
-			return null;
-		},
+            
+            let tBegin = arg.indexOf(DELIM_TITLE_LEFT);
+            let tEnd = arg.indexOf(DELIM_TITLE_RIGHT);
+            if (tBegin != -1 && tEnd != -1 && tBegin != tEnd){
+                let _rawData = arg.slice(tBegin, tEnd+1);
+                let _pathArray = arg.slice(tBegin + 1, tEnd).split(DELIM_AND_CONDITION);
+                return { rawData : _rawData
+                        ,valueArray : _pathArray};
+            }
+            return null;
+        },
 
-		//=== is[a] ===
-		isRange : function(arg){
-			let range = arg.split(DELIM_RANGE);
-			console.log("In is IsRange " + range);
-    		console.log("RANGE: All tabs map:" + this.parent.activeIndexToIdMap);
-			return range.length > 1 ? range : null;
-		},
+        //=== is[a] ===
+        isRange : function(arg){
+            let range = arg.split(DELIM_RANGE);
+            console.log("In is IsRange " + range);
+            console.log("RANGE: All tabs map:" + this.parent.activeIndexToIdMap);
+            return range.length > 1 ? range : null;
+        },
 
-		isNumber : function(num){
-		//	return !Number.isNaN(num) && Number.isFinite(num)
-			return !isNaN(num);
-		}
-	},
+        isNumber : function(num){
+        //  return !Number.isNaN(num) && Number.isFinite(num)
+            return !isNaN(num);
+        }
+    },
 
-	UIchanger : {
-		paintTabLabels : function(tabs = this.parent.gBrowser.visibleTabs
-									,group = this.parent.currentGroup) {
-    		for (let tab of tabs)
-        		this.addLabel(tab, group);
-		},
+    UIchanger : {
+        paintTabLabels : function(tabs = this.parent.gBrowser.visibleTabs
+                                    ,group = this.parent.currentGroup) {
+            for (let tab of tabs)
+                this.addLabel(tab, group);
+        },
 
-		removeTabLabels : function() {
-			let tabs = this.parent.visibleTabs;
-			for (let tab of tabs)
-				this.removeLabel(tab);
-		},
+        removeTabLabels : function() {
+            let tabs = this.parent.visibleTabs;
+            for (let tab of tabs)
+                this.removeLabel(tab);
+        },
 
-		addLabel : function(tab, group = this.parent.currentGroup) {
-    		let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
-    		let chromeDocument = tab.ownerDocument;
+        addLabel : function(tab, group = this.parent.currentGroup) {
+            let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
+            let chromeDocument = tab.ownerDocument;
 
             // console.log("addLabel: group.idToIndexMap:" + group.idToIndexMap.toSource());
             // console.log("addLabel: group.indexToIdMap:" + group.indexToIdMap.toSource());
 
-    		if (!tabLabel) {
-        		let index = group.idToIndexMap[tab.linkedPanel];
+            if (!tabLabel) {
+                let index = group.idToIndexMap[tab.linkedPanel];
                 // console.log("addLabel: adding for id:" + tab.linkedPanel + " an index:" + index);
-        		tabLabel = chromeDocument.createElementNS(XULNS, 'label');
-        		tabLabel.setAttribute('anonid',TABINDEX_ANONID);
-        		tabLabel.className = 'tab-text';
-				tabLabel.setAttribute('align', 'right');
-        		tabLabel.style.color = TABLABEL_STYLE_COLOR;
-        		tabLabel.style.backgroundColor = TABLABEL_STYLE_BACKGROUNDCOLOR;
-        		tabLabel.style.animation = TABLABEL_STYLE_ANIMATION;
-				tabLabel.setAttribute('ordinal', TABLABEL_POSITION);
-        		tabLabel.setAttribute('value', index);
+                tabLabel = chromeDocument.createElementNS(XULNS, 'label');
+                tabLabel.setAttribute('anonid',TABINDEX_ANONID);
+                tabLabel.className = 'tab-text';
+                tabLabel.setAttribute('align', 'right');
+                tabLabel.style.color = TABLABEL_STYLE_COLOR;
+                tabLabel.style.backgroundColor = TABLABEL_STYLE_BACKGROUNDCOLOR;
+                tabLabel.style.animation = TABLABEL_STYLE_ANIMATION;
+                tabLabel.setAttribute('ordinal', TABLABEL_POSITION);
+                tabLabel.setAttribute('value', index);
 
-				chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
+                chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
 
-		 	 	 tabLabel.style.borderBottomLeftRadius =
-                     	 	 tabLabel.style.borderBottomRightRadius =
-                     	 	 tabLabel.style.borderTopLeftRadius =
-                     	 	 tabLabel.style.borderTopRightRadius = TABLABEL_STYLE_BORDERRADIUS;
-				tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
-				tabLabel.style.minHeight = TABLABEL_STYLE_MINHEIGHT;
-				tabLabel.style.textAlign = TABLABEL_STYLE_TEXTALIGN;
-				tabLabel.style.fontWeight = TABLABEL_STYLE_FONTWEIGHT;
-				tabLabel.style.fontSize = TABLABEL_STYLE_FONTSIZE;
-				if (tab.pinned){
-					this.parent.actions.fixPinnedTabs();
-					tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;	
-				}
+                 tabLabel.style.borderBottomLeftRadius =
+                             tabLabel.style.borderBottomRightRadius =
+                             tabLabel.style.borderTopLeftRadius =
+                             tabLabel.style.borderTopRightRadius = TABLABEL_STYLE_BORDERRADIUS;
+                tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
+                tabLabel.style.minHeight = TABLABEL_STYLE_MINHEIGHT;
+                tabLabel.style.textAlign = TABLABEL_STYLE_TEXTALIGN;
+                tabLabel.style.fontWeight = TABLABEL_STYLE_FONTWEIGHT;
+                tabLabel.style.fontSize = TABLABEL_STYLE_FONTSIZE;
+                if (tab.pinned){
+                    this.parent.actions.fixPinnedTabs();
+                    tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;   
+                }
 
-				// layer tests WORKS!
+                // layer tests WORKS!
                 // let tabLabelLayer;
                 // tabLabelLayer = chromeDocument.createElementNS(XULNS, 'xul:hbox');
                 // tabLabelLayer.setAttribute('align', 'right');
@@ -1538,46 +1537,46 @@ this.TabsManager = {
                 // chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-stack').appendChild(tabLabelLayer);
                 //            tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
 
-    		} else {
-        		this.updateLabel(tab, group);
-    		}
-		},
+            } else {
+                this.updateLabel(tab, group);
+            }
+        },
 
-		updateLabel : function(tab, group = this.parent.currentManager) {
-    		let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
-    		let index = group.idToIndexMap[tab.linkedPanel];
+        updateLabel : function(tab, group = this.parent.currentManager) {
+            let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
+            let index = group.idToIndexMap[tab.linkedPanel];
 
-    		tabLabel.setAttribute('value', index);
-			if (tabLabel.parentNode.getAttribute('pinned') === 'true'){
-				this.parent.actions.fixPinnedTabs();
-				tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;
-			}else{
-				tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
-			}
-		},
+            tabLabel.setAttribute('value', index);
+            if (tabLabel.parentNode.getAttribute('pinned') === 'true'){
+                this.parent.actions.fixPinnedTabs();
+                tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;
+            }else{
+                tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
+            }
+        },
 
-		removeLabel : function(tab) {
-    		let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
-			if (tabLabel){
-				tabLabel.parentNode.removeChild(tabLabel);	
-			}
-		},
+        removeLabel : function(tab) {
+            let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
+            if (tabLabel){
+                tabLabel.parentNode.removeChild(tabLabel);  
+            }
+        },
         removeAllLabels : function() {
             let tabs = this.parent.gBrowser.tabs;
             for (let tab of tabs)
                 this.removeLabel(tab);
         }
-	},	
+    },  
 
 
-	init:function(){
-		this.events.parent = this;
-		this.actions.parent = this;
-		this.dataParser.parent = this;
-		this.UIchanger.parent = this;
-		delete this.init;
-		return this;
-	}
+    init:function(){
+        this.events.parent = this;
+        this.actions.parent = this;
+        this.dataParser.parent = this;
+        this.UIchanger.parent = this;
+        delete this.init;
+        return this;
+    }
 }.init();
 }
 
@@ -1594,7 +1593,7 @@ exports.onUnload = function (reason) {
 //  try { window.clearTimeout(count.timeout) } catch(e) {};
 //  count.timeout = window.setTimeout(()=> {
 //     var all = gBrowser.tabs.length, visible = gBrowser.visibleTabs.length; 
-// 	console.log("All tabs count :" + all + " visible count:" + visible);
+//  console.log("All tabs count :" + all + " visible count:" + visible);
 //    // tabCounter.label = (all > visible ? visible + '/' : '') + all;
 //  }, 350);
 //};
@@ -1620,8 +1619,8 @@ exports.onUnload = function (reason) {
 var { Hotkey } = require("sdk/hotkeys");
 
 var showHotkey = Hotkey({
-	combo: "shift-return",
-	onPress: function() {
+    combo: "shift-return",
+    onPress: function() {
         if (commandsPopup.isShowing)
             commandsPopup.hide();
         else
@@ -1630,26 +1629,26 @@ var showHotkey = Hotkey({
 });
 
 var scrollUpHotkey = Hotkey({
-	combo: "shift-pageup",
-	onPress: function() {
-		handleScrollEvent(-SCROLL_STEP);
-	}
+    combo: "shift-pageup",
+    onPress: function() {
+        handleScrollEvent(-SCROLL_STEP);
+    }
 });
 
 var scrollDownHotkey = Hotkey({
-	combo: "shift-pagedown",
-	onPress: function() {
-		handleScrollEvent(SCROLL_STEP);
-	}
+    combo: "shift-pagedown",
+    onPress: function() {
+        handleScrollEvent(SCROLL_STEP);
+    }
 });
 
 function correctId(tabId){
-	return tabId.substring('panel'.length);
+    return tabId.substring('panel'.length);
 }
 
 //================================================================
 function handleScrollEvent(px) {
-	var window = WindowsManager.actions.getCurrentWindow();
+    var window = WindowsManager.actions.getCurrentWindow();
     var tabBrowser = window.document.getElementById('tabbrowser-tabs');
     var tabScrollBox = window.document.getAnonymousElementByAttribute(tabBrowser,
                                         "class", 
