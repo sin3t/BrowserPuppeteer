@@ -198,7 +198,7 @@ var WindowsManager = {
             
             setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
             const toWidgetId = id =>
-                          ('action-button--browserpuppeteer-' + id);
+                          ('action-button--browser-puppeteer-' + id);
             const buttonView = require('sdk/ui/button/view');
             buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
         }
@@ -359,7 +359,7 @@ var WindowsManager = {
                         setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
                         // let { getActiveView }=require("sdk/view/core");
                         const toWidgetId = id =>
-                                      ('action-button--browserpuppeteer-' + id);
+                                      ('action-button--browser-puppeteer-' + id);
                         const buttonView = require('sdk/ui/button/view');
                         buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
                         // getActiveView(groupStateBtn, window).style.display = 'none';
@@ -764,7 +764,6 @@ this.TabsManager = {
         },
 
         bookmarkTab : function(tabIndex, aParams){
-
             function searchFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder){
                 let options = historyService.getNewQueryOptions();
                 let query = historyService.getNewQuery();
@@ -787,7 +786,6 @@ this.TabsManager = {
                 rootNode.containerOpen = false; 
                 return null;
             }
-
             function createFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder){
                 let folderId = bookmarksService.createFolder(
                     parentFolder, 
@@ -907,7 +905,6 @@ this.TabsManager = {
         
         changeGroupByName : function(name){
             
-
         },
 
         createGroup : function(name){
@@ -1101,10 +1098,10 @@ this.TabsManager = {
             aParams.valueArrayWithExcludings = [...new Set(aParams.valueArrayWithExcludings)];
 
             // Setup act array with respect of excluding values
-            for (let id of aParams.valueArrayWithExcludings){
-                if (aParams.excluding && aParams.excluding.valueArray.includes(id))
+            for (let index of aParams.valueArrayWithExcludings){
+                if (aParams.excluding && aParams.excluding.valueArray.includes(index))
                     continue;
-                aParams.valueArray.push(id);
+                aParams.valueArray.push(index);
             }
             
             // Find nearest non-actioned -> TODO: move to own function
@@ -1137,7 +1134,6 @@ this.TabsManager = {
             let execState = EXEC_OK;
             let execMsg = "";
             const runLoop = (aParams, i=0) => {
-                
                 if (i == aParams.valueArray.length) return;
             
                 let value = aParams.valueArray[i];

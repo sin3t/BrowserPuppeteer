@@ -1,120 +1,7 @@
  <meta charset="UTF-8"> 
 <html>
 <head>
-    <style type="text/css" media="all">
-      input {
-          width: 100%;
-      }
-      body {
-          overflow: hidden;
-          display:inline-block;
-          margin:5px;
-		  padding 10px;
-          background-color: #DEDEDE;
-          width: 300px;
-          max-width: 300px;
-          max-height: 470px;
-		  padding-left: 5px;
-          padding-bottom: 10px;
-      }
-
-
-      table {
-          width: 100%;
-		  border-collapse: collapse;
-
-      }
-      td {
-          padding: 5px;
-          font-size: 13px;
-          text-align: center;
-          word-wrap: break-word;
-          white-space: normal;
-      }
-	  tr {
-		  border-bottom: 1px solid #ccc;
-	  }
-	  tr:hover {
-		  background-color: red;
-	 }
-	  td:hover:nth-child(1){
-		 background-color: red;
-	  }
-      th{
-            font-size: 13px;
-            white-space: nowrap;
-      }
-      td:nth-child(1){
-          background-color: #c0c6c0;
-      }
-	  td:nth-child(2){
-		  width: 38px;
-		  text-align: center;
-	  }
-      td:nth-child(3){
-          text-align: left;
-      }
-      img {
-          width: 80px;
-		  height: auto;
-      }
-
-      li, .histCmd {
-          display: inline-block;
-          margin: 3px;
-          border: 1px solid;
-          border-radius: 3px;
-          padding: 4px;
-      }
-      li:hover { background: #99BADD }
-      ul {
-          padding: 10px;
-          margin: 2px;
-      }
-      label {
-          font-size:10px;
-      }
-      .infoBar {
-          width: 4px;
-          height : 4px;
-          vertical-align: middle;
-      }
-      .histCmdOK {
-          background-color: #4AE54A;
-      }
-      .histCmdERR {
-          background-color: #FE806B;
-      }
-      .histCmdPartialOK {
-          background-color: #FEF052;
-      }
-      #data-container {
-          max-height: 280px
-      }
-      #history-container {
-          max-height: 150px;
-      }
-      #data-container, #history-container {
-          overflow: auto;
-          overflow-x: hidden;
-      }
-      #progress-container {
-          display: none;
-          width: 100%;
-          padding-top: 2px;
-      }
-      #progress-bar, #progress-info {
-          display: table-cell;
-      }
-      #progress-bar {
-          width: 100%;
-      }
-      #progress-info {
-          width: 1px;
-          white-space: nowrap;
-          padding: 5px;
-      }
-    </style>
+    <link href="commandsPopupStyle.css" rel="stylesheet" type="text/css">
   </head>
   <body tabindex="-1">
     <input type="text" id="edit-box" tabindex="1">
@@ -122,9 +9,9 @@
         <progress value="0" id="progress-bar"></progress>
         <label id="progress-info"></label>
     </div>
-		<div id="msgInfo-container"></div>
+    <div id="msgInfo-container"></div>
     <div id="data-container"></div>
-		<hr>
-		<div id="history-container" tabindex="3"></div>
+    <hr>
+    <div id="history-container" tabindex="3"></div>
   </body>
 </html>
