@@ -4,6 +4,7 @@ const XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 const 
     BROWSER = 'navigator:browser',
     NEWTAB_URL = 'about:home',
+    NEWTAB_BLANK_URL = 'about:blank',
 
     SCROLL_STEP = 50,
     TABVIEW_POLLING_TIME = 1000,
@@ -47,6 +48,9 @@ const
     ACTION_STOPLOAD_T = "s",
     ACTION_TOOGLE_PINNING = "p",
     ACTION_TREESTYLETAB_CONTROL = "t",
+
+    COMMANDSPOPUP_POSITION = 40,
+    COMMANDSPOPUP_HEIGHT = 50,
 
     TABLABEL_POSITION = '950',
     TABLABEL_STYLE_COLOR = '#FFFFFF',
@@ -130,9 +134,9 @@ function setBtnBadgeValue(btn, window, value){
 var data = require("sdk/self").data;
 var commandsPopup = require("sdk/panel").Panel({
     position: { 
-        top: 40, 
+        top: COMMANDSPOPUP_POSITION, 
     },
-    height:50,
+    height: COMMANDSPOPUP_HEIGHT,
     contentURL: data.url("commandsPopup.html"),
     contentScriptFile: data.url("commandsPopupLogic.js"),
     contentScript: "self.port.emit('resize', " +
@@ -741,7 +745,7 @@ this.TabsManager = {
                 case DELIM_PLACE_WINDOW : 
                     // this.parent.gBrowser.replaceTabWithWindow(tabToMove); 
                     let window = WindowsManager.actions.getWindowAt(placeIndex);
-                    let newTab = window.gBrowser.addTab('about:blank');
+                    let newTab = window.gBrowser.addTab(NEWTAB_BLANK_URL);
                     newTab.linkedBrowser.webNavigation.stop(Ci.nsIWebNavigation.STOP_ALL);
                     window.gBrowser.swapBrowsersAndCloseOther(newTab, tabToMove);
                     window.gBrowser.selectedTab = newTab;
