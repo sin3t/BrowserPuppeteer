@@ -13,8 +13,8 @@
 
 State| Cmd                  |  Description  
 |----|----------------------|-------------------------------------------------------------
-| +  |5"                    | goes to the 5 tabs,
-|    |g1"                   | goes to the 1 group
+| +  |5                     | goes to the 5 tab
+|    |g1                    | goes to the 1 group
 |    |g/oldName/->/newName/ | rename group?
 |    |15g1"                 | goest the 1 group, 15 tab in THAT group
 |    | x<some content>      | hiden action, dont show in cmd history
