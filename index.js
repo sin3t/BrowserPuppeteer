@@ -512,6 +512,7 @@ this.TabsManager = {
 
     // TODO: Dont add group buttons in windows without tabs
     // TODO: Set button style after every value change (because of own button restyling)
+    // TODO: Test solution with MutationOservers
     pollForTabView : function(){
         this.ownerWindow.setTimeout(() => {
             if (this.ownerWindow.TabView._window){
@@ -1569,7 +1570,7 @@ this.TabsManager = {
     },  
 
 
-    init:function(){
+    init : function() {
         this.events.parent = this;
         this.actions.parent = this;
         this.dataParser.parent = this;
@@ -1580,14 +1581,6 @@ this.TabsManager = {
 }.init();
 }
 
-WindowsManager.init();
-Services.wm.addListener(WindowsManager.events.windowListener);
-
-// https://developer.mozilla.org/en-US/docs/Extensions/Common_causes_of_memory_leaks_in_extensions
-exports.onUnload = function (reason) {
-    Services.wm.removeListener(WindowsManager.events.windowListener);
-    WindowsManager.uninit();
-};
 
 //function count() {
 //  try { window.clearTimeout(count.timeout) } catch(e) {};
@@ -1615,7 +1608,7 @@ exports.onUnload = function (reason) {
 //  return Array.filter(getTabContainer(window).children, t => !t.closing);
 //}
 
-//== Hotkeys bindings ============================================
+//== Hotkeys bindings =========================================================
 var { Hotkey } = require("sdk/hotkeys");
 
 var showHotkey = Hotkey({
@@ -1646,7 +1639,7 @@ function correctId(tabId){
     return tabId.substring('panel'.length);
 }
 
-//================================================================
+//=============================================================================
 function handleScrollEvent(px) {
     var window = WindowsManager.actions.getCurrentWindow();
     var tabBrowser = window.document.getElementById('tabbrowser-tabs');
@@ -1660,9 +1653,17 @@ function handleScrollEvent(px) {
     // tabScrollBox.scrollByPixels(-50,0);
     tabScrollBox.scrollByPixels(px,px);
 }
-//===============================================================
+//== WindowsManager initialization ============================================
 
+WindowsManager.init();
+Services.wm.addListener(WindowsManager.events.windowListener);
 
+//== Extension unload handling ================================================
 
+// https://developer.mozilla.org/en-US/docs/Extensions/Common_causes_of_memory_leaks_in_extensions
+exports.onUnload = function (reason) {
+    Services.wm.removeListener(WindowsManager.events.windowListener);
+    WindowsManager.uninit();
+};
 
 

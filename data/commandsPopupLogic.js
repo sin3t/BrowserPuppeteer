@@ -19,6 +19,7 @@ const
 
 let textInput = document.getElementById("edit-box");
 let progressBar = document.getElementById("progress-bar");
+let progressCmd = document.getElementById("progress-cmd");
 let progressLabel = document.getElementById("progress-info");
 let progressContainer = document.getElementById("progress-container");
 let dataContainer = document.getElementById("data-container");
@@ -59,6 +60,12 @@ addEventListener('keyup', function keyPress(event){
         console.log("Tab key pressed");
     }
 }, false);
+
+
+function fixPopupSize(){
+	self.port.emit('resize',{width: document.documentElement.clientWidth, 
+					height: document.documentElement.clientHeight});
+}
 
 self.port.on("show", function onShow() {
     textInput.focus();
@@ -103,10 +110,7 @@ self.port.on("requestData-arrived", function onReqDataArrive(info){
     }
     dataContainer.appendChild(table);
     dataContainer.setAttribute('tabindex','2');
-    setTimeout(()=>
-        self.port.emit('resize',{width: document.documentElement.clientWidth, 
-                        height: document.documentElement.clientHeight}), 
-        WAIT_RESIZE_TIMEOUT);
+	setTimeout(()=> fixPopupSize(), WAIT_RESIZE_TIMEOUT);
 });
 
 self.port.on("task-completed", function onTaskCompleted(){
@@ -115,8 +119,7 @@ self.port.on("task-completed", function onTaskCompleted(){
     removeChilds(histContainer);
     textInput.value = '';
     dataContainer.setAttribute('tabindex','-1');
-    self.port.emit('resize',{width: document.documentElement.clientWidth, 
-                    height: document.documentElement.clientHeight});
+	fixPopupSize();
 });
 
 self.port.on("historyData-arrived", function onHistDataArrive(data){
@@ -149,22 +152,65 @@ self.port.on("historyData-arrived", function onHistDataArrive(data){
     }
     histContainer.appendChild(list);
 
-    self.port.emit('resize',{width: document.documentElement.clientWidth, 
-         height: document.documentElement.clientHeight});
-    textInput.focus(); // Temp fix of periodical focus loose
+	fixPopupSize();
+	textInput.focus(); // Temp fix of periodical focus loose
 });
 
-self.port.on("progressChange", function onProgressChanged(value, length){
+self.port.on("progressChange", function onProgressChanged(value, length, cmd){
     if (length > 1){
-        if (progressContainer.style.display !== 'table')
+        if (progressContainer.style.display !== 'table'){
             progressContainer.style.display = 'table';
+			progressCmd.textContent = "Exectuting command: " + cmd;
+			fixPopupSize();
+		}
         value += 1;
         progressLabel.textContent = value + " of " + length;
         progressBar.max = length;
         progressBar.value = value;
     }
-    if (value === length)
+    if (value === length){
         progressContainer.style.display = 'none';
+		fixPopupSize();
+	}
     self.port.emit("progressChanged");
 });
+
+// var observer = new MutationObserver(function(mutations) {
+//   mutations.forEach(function(mutation) {
+//     console.log("type:" + mutation.type);
+//     console.log("attrName:" + mutation.attributeName);
+//     console.log("oldValue:" + mutation.oldValue);
+//     console.log("target:" + mutation.target);
+//     console.log("NativeAcess.style.display:" + mutation.target.style.display);
+//     console.log("NativeAcess.id:" + mutation.target.id);
+//     console.log("documentElement:" + document.documentElement);
+//     console.log("documentElement.id:" + document.documentElement.id);
+// 
+//     if (mutation.attributeName == 'style'){
+//         self.port.emit('resize',{width: document.documentElement.clientWidth, 
+//              height: document.documentElement.clientHeight});
+//     }
+//   });
+// });    
+
+// configuration of the observer:
+// var config = { attributes: true, attributeOldValue: true };
+ 
+// pass in the target node, as well as the observer options
+// observer.observe(progressContainer, config);
+
+// self.addEventListener("resize", function(event) {
+//     console.log("-----self resize-----");
+//     console.log("typeof self:" + typeof self);
+//     console.log("event.type:" + event.type);
+//     console.log("event.target:" + event.target);
+//     console.log("Resize event called");
+//     // self.port.emit('resize',{width: document.documentElement.clientWidth, 
+//     //      height: document.documentElement.clientHeight});
+// });
+
+// addEventListener("resize", function(event) {
+//     self.port.emit('resize',{width: document.documentElement.clientWidth, 
+//          height: document.documentElement.clientHeight});
+// });
 
