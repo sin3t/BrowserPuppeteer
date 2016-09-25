@@ -1412,6 +1412,8 @@ this.TabsManager = {
             }else{
                 if (_target == "")
                     _target = this.parent.getCurrentTabIndex();
+                if (_target == "w")
+                    _target = T_WINDOW + WindowsManager.actions.getCurrentWindowIndex();
                 _valueArr.push(_target);
             }
             return _valueArr;

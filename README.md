@@ -11,6 +11,7 @@ Complete text command-based extention to control browser. It provides tab number
  You can easily jump to that tabs by numbers, perform most of the available actions (See 3 section).
 
 2. Ability to scroll overflowed TabBar with hotkeys without changing any focus. 
+
  Just use `Shift + PageUp` to scroll Top/Left, and `Shift + PageDown` to scroll Bottom/Right..
 
 3. Text-based browser control with specific commands
