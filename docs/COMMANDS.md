@@ -32,27 +32,39 @@ Each command consists of several sections : action to do, target to act with, ac
  
 
 ### Targets
+```
+							  +-----------------------------------------------------+
+                              |              	Multiple vlaues                     |
+   +--------------------------+--------------+-------+--------------+---------------+
+   |       Target             |Several values| Range |  Host search |  Title search |
+   +-----------------+--------+--------------+-------+--------------+---------------+
+   | Tab modifier    |  1..N  |    1, 2, 3   |  1-4  | "example.com"|    <word>     |
+   | Window modifier | w1..wN |   w1, w2, w5 | w1-w5 |       -      |       -       |
+   | Group modifier  | g1..gN |   g1, g2, g5 | g1-g5 |       -      |       -       |
+   +-----------------+--------+--------------+-------+--------------+---------------+
+                     |		   	 Explicit            |           Implicit           |
+                     +-------------------------------+------------------------------+
+```
 Types:
- - tab - number from 1 to N
-	* 1, 2, 55, 100 
- - window - w + number from 1 to N
-	* w1, w2, w55, w100
- - group - g + number from 1 to N
-	* g1, g2, g55, g100
+ - tab - number from 1 to N;
+	* 1, 2, 55, 100;
+ - window - w + number from 1 to N;
+	* w1, w2, w55, w100;
+ - group - g + number from 1 to N;
+	* g1, g2, g55, g100.
 
 Multiple targets are supported, and can be specified in explicit and implicit ways.
-
  - Explicitly: 
-	- comma separated values - "several value" 
+	- comma separated values - "several value";
 		* 1, 2, 3, 4, 5;
-	- range specific values with reverse range support  - "range" 
+	- range specific values with reverse range support  - "range";
 		* 1-5 or 5-1;
 
  - Implicitly:
-	- by searching matches in url, currently are supported only host matches - "host search" 
-		* "google.com"
-	- by searching matches in tab title - "title search" 
-		* \<some phrase in title>
+	- by searching matches in url, currently are supported only host matches - "host search";
+		* "google.com";
+	- by searching matches in tab title - "title search";
+		* \<some phrase in title>.
 
 
 Targets, that are being current items, are substituted automatically, the same with last existing item modifier. For example, we need to move current tab with position 25 to the position(index) 40, that is the last one, so can write:
@@ -72,11 +84,11 @@ More examples:
  - `x""5` - close tabs with host of the tab 5.
 
 Also note two things about title searches:
-1. You can provide nested searches in tab title:
+ 1. You can provide nested searches in tab title:
   - `< word 1 >,< word 2>` - means to search " word 1 " OR " word 2 ";
   - `< word 1 & word 2 >` - means to search " word 1 " AND " word 2 ".
 
-2. Beware logical ambiguity in title searches:
+ 2. Beware logical ambiguity in title searches:
   - `<eat>` - will match both "eat" and "neat";
   - `< eat >` - will match only "eat" and will match anywhere, except the beggining or the end of the line (its because of spaces).
 
@@ -89,9 +101,37 @@ Examples:
  - `m"youtube.com"g5!<music>` - move tabs with host "youtube.com" to the group 5, exclude tabs with word "music" in title.
 
 
-## Useful examples
+## Useful examples            
 
-
+ - `23` - switch to tab with index 23;
+ - `w5` - switch to window with index 5;
+ - `g7` - switch to group with index 7; 
+ - `c` - create new tab;
+ - `cw` - create new window;
+ - `xw` - close current window;
+ - `xw2-w5` - close windows from 2 to 5;
+ - `x22,34,45-60!51` - close tabs 22,23, from 45 to 60, except 51;
+ - `b` - bookmark current tab;
+ - `b1-e/toRead/genetics/` - bookmark tabs from first to last into folder tree "toRead"->"genetics";
+ - `x"youtube.com"` - close all tabs with opened youtube.com site;
+ - `x""` - close all tabs with currenly opened host (like youtube.com etc);
+ - `x""3` - close all tabs with host, opened in tab with index 3;
+ - `x-e` - close all tabs from current(including) to the end;
+ - `x-e!` - close all tabs from current(excluding) to the end;
+ - `x-e!"youtube.com"` - close all tabs from current to the end, except tabs with opened youtube.com;
+ - `m25@1` - move tab with index 25 on to position 1;
+ - `m@e` - move current tab to the end;
+ - `m<.pdf>w3` - move all tabs with ".pdf" word in title to the window 3;
+ - `m<funny & cats>,<funny & dogs>w2` - move all tabs with words in title "funny " AND " cats" or "funny " AND " dogs" to the window 2 (note spaces usage);
+ - `cg` - create new tabs group;
+ - `x1-e!"google.com","wikipedia.org",<work>` - close tabs from first to the last one, except tabs with opened google.com site, wikipedia.org site, and except tabs with word "work" in title;
+ - `lw` - list currently opened windows with index info;
+ - `lg` - list currently opened groups with index info;
+ - `x22-35,w1,g5` - close tabs from 22 to 35, also close window 1 and group 5;
+ - `p1-3` - toggle pinning of tabs from 1 to 3;
+ - `r"github.com"` - reload all tabs, with github.com site;
+ - `s1-e` - stop loading of the tabs from first to the last;
+ - `x""5,""2,<cooking>!23-40` - close all tabs with hosts, opened in tab 5 and in tab 2, also close tabs with word "cooking" in title, but exclude from closing tabs from 23 to 40.
 
 ***
 
@@ -108,11 +148,11 @@ s2 | Tab modifier    | + |   -   |   -   |  -   |   -    |
    | Group modifier  | + |   -   |   -   |  -   |   -    |
    +---------------------+-------+-------+------+--------+
    |25                                                   |
-   |    Go to the tab with number 25				     |
+   |    Go to the tab with number 25.				     |
    |w3                                                   |
-   |    Go to the window 3							     |
+   |    Go to the window 3.							     |
    |g5                                                   |
-   |    Go to the group 5							     |
+   |    Go to the group 5.							     |
    +-----------------------------------------------------+
 ```
 
@@ -152,19 +192,19 @@ s2 | Tab modifier    | + |   +   |   +   |  -   |   -    |
 sN | Not supported                                       |
    +-----------------------------------------------------+
    |c                                                    |
-   |    Create new tab 								     |
+   |    Create new tab.								     |
    |c5                                                   |
    |    Create new tab in specific position. This feature|
    |	is supported only by tabs (now). 				 |
    |cw                                                   |
-   |    Create new window							     |
+   |    Create new window.							     |
    +-----------------------------------------------------+
 ```
 
 ### Stop loading
 ```
    +-----------------------------------------------------+
-s1 | s  - stop loading of the tab					     |
+s1 | s - stop loading of the tab	 				     |
    +---------------------+-------+-------+------+--------+
    |       Target        |Several| Range | Host | Title  |
    |---------------------|values |       |search| search |
@@ -175,14 +215,14 @@ s2 | Tab modifier    | + |   +   |   +   |  +   |   +    |
 sN | Supported                                           |
    +-----------------------------------------------------+
    |s1-60                                                |
-   |    Stop loading tabs  from 1 to 60				     |
+   |    Stop loading tabs  from 1 to 60.			     |
    +-----------------------------------------------------+
 ```
 
 ### Reload
 ```
    +-----------------------------------------------------+
-s1 | r  - reload tab		   							 |
+s1 | r - reload tab 		   							 |
    +---------------------+-------+-------+------+--------+
    |       Target        |Several| Range | Host | Title  |
    |---------------------|values |       |search| search |
@@ -193,7 +233,7 @@ s2 | Tab modifier    | + |   +   |   +   |  +   |   +    |
 sN | Supported                                           |
    +-----------------------------------------------------+
    |r-e                                                  |
-   |    Force reloading tabs from current to the end     |
+   |    Force reloading tabs from current to the end.    |
    +-----------------------------------------------------+
 ```
 
@@ -211,7 +251,7 @@ s2 | Tab modifier    | + |   +   |   +   |  +   |   +    |
 sN | Supported                                           |
    +-----------------------------------------------------+
    |p1,3                                                 |
-   |    Toggle pinning of the tabs 1 and 3				 |
+   |    Toggle pinning of the tabs 1 and 3.				 |
    +-----------------------------------------------------+
 ```
 
@@ -229,12 +269,12 @@ s2 | Tab modifier    | + |   +   |   +   |  +   |   +    |
 sN | Supported                                           |
    +-----------------------------------------------------+
    |x                                                    |
-   |    Close current tab								 |
+   |    Close current tab.								 |
    |xw                                                   |
-   |    Close current window							 |
+   |    Close current window.							 |
    |x1-5,w2-w6,g1,g3-g5                                  |
    |    Close tabs from 1 to 5, windows from 2 to 6, and |
-   |    group 1 and groups from 3 to 5					 |
+   |    group 1 and groups from 3 to 5.					 |
    +-----------------------------------------------------+
 ```
 
@@ -290,13 +330,11 @@ sN | Supported											 |
    |    Move tabs from 24 to 50 and 72, also tabs witg   |
    |    opened host "ex.com", and tabs with word "word"  |
    |    in title to the position 5.    				     |
-   |                                                     |
-   | m1-ew3!<needed info>                                |
-   |     Move tab from 1 to the last to the window 3     |
-   |     except tabs with word "needed info" in title.   |
-   |                                                     |
-   | m@e                                                 |
-   |     Move current tab to the end.                    |
+   |m1-ew3!<needed info>                                 |
+   |    Move tab from 1 to the last to the window 3      |
+   |    except tabs with word "needed info" in title.    |
+   |m@e                                                  |
+   |    Move current tab to the end.                     |
    +-----------------------------------------------------+
 ```
 
