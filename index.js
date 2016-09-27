@@ -197,14 +197,8 @@ var WindowsManager = {
             this.windowToManagerMap.set(window, manager);
 
             this.idToWindowMap.set(windowId, window);
-            this.doIndexIdRemaping();
-            
-            setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
-            const toWidgetId = id =>
-                          ('action-button--browser-puppeteer-' + id);
-            const buttonView = require('sdk/ui/button/view');
-            buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
         }
+        this.updateLabelsData();
     },
 
     uninit : function() {
@@ -218,7 +212,6 @@ var WindowsManager = {
 
     windowToManagerMap : new Map(),
     idToWindowMap : new Map(),
-    openedWindows : [],
     tabsManagers : [],
     indexToIdMap : {},
     idToIndexMap : {},
@@ -232,7 +225,7 @@ var WindowsManager = {
     },
 
     get countOfWindows() {
-        return this.handlingWindows.length;  
+        return this.windowToManagerMap.size;  
     },
 
     updateLabelsData : function(){
@@ -352,14 +345,30 @@ var WindowsManager = {
 
     UIChanger : {
         paintWindowLabels : function(){
+            // const toWidgetId = id =>
+            //               ('action-button--browser-puppeteer-' + id);
+            // const buttonView = require('sdk/ui/button/view');
             for (let window of WindowsManager.handlingWindows){
                 setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
+                // buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
+                viewFor(windowStateBtn).style.fontWeight = "bold";
+                viewFor(groupStateBtn).style.fontWeight = "bold";
+                viewFor(groupStateBtn).style.display = "none";
             }
         }
     },
 
     // TODO: Disable listener on set of actions, or do not update windows map untill finish (in such cases)
     events : {
+        mustUpdateIndexes : true,
+        disallowUpdatingLabelsData : function(){
+            mustUpdateIndexes = false;
+        },
+
+        allowUpdatingLablesData : function(){
+            mustUpdateIndexes = true;
+        },
+
         windowListener : {
             onOpenWindow : function (xulWindow) {
                 var window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -376,12 +385,8 @@ var WindowsManager = {
 
                         WindowsManager.idToWindowMap.set(WindowsManager.actions.getWindowId(window), window);
                         // =================================
-                        WindowsManager.doIndexIdRemaping();
-                        setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
-                        const toWidgetId = id =>
-                                      ('action-button--browser-puppeteer-' + id);
-                        const buttonView = require('sdk/ui/button/view');
-                        buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
+                        if (mustUpdateIndexes)
+                            WindowsManager.updateLabelsData();
                     }
                 }
                 window.addEventListener("load",onWindowLoad);
@@ -400,7 +405,8 @@ var WindowsManager = {
                 let idToDelete = WindowsManager.actions.getWindowId(window);
                 WindowsManager.idToWindowMap.delete(idToDelete);
 
-                WindowsManager.updateLabelsData();
+                if (mustUpdateIndexes)
+                    WindowsManager.updateLabelsData();
             },
 
             onWindowTitleChange : function (aWindow, aTitle) {
@@ -535,7 +541,7 @@ this.TabsManager = {
             if (this.ownerWindow.TabView._window){
                 if (this.lastActiveGroupItem !== this.groupItems.getActiveGroupItem())
                     this.lastActiveGroupItem = this.groupItems.getActiveGroupItem();
-
+                 
                 setBtnBadgeValue(groupStateBtn, this.ownerWindow, T_GROUP + this.lastActiveGroupItem.id);
                 viewFor(groupStateBtn).style.display = "initial";
 
@@ -1003,7 +1009,7 @@ this.TabsManager = {
             }
         },
         subscribeTabEvents : function(){
-            if (!this.tabViewPollingFinished)
+            if (!this.parent.tabViewPollingFinished)
                 this.parent.pollForTabView();
             if (!this.isSubscripted){
                 this.examinedEvents.forEach(event => {
@@ -1166,6 +1172,7 @@ this.TabsManager = {
             let hasManyTargets = aParams.valueArray.length > 1;
             if (hasManyTargets){
                 this.parent.events.unsubscribeTabEvents();
+                WindowsManager.events.disallowUpdatingLabelsData();
             }
 
             let execState = EXEC_OK;
@@ -1188,10 +1195,16 @@ this.TabsManager = {
                      execState = EXEC_ERROR;
                 }
                 commandsPopup.port.once("progressChanged", runLoop.bind(null, aParams, i+1));
-                commandsPopup.port.emit("progressChange", i, aParams.valueArray.length);
+                commandsPopup.port.emit("progressChange", i, aParams.valueArray.length, cmd);
                 if (i == aParams.valueArray.length - 1){
-                    this.parent.events.subscribeTabEvents();
-                    this.parent.updateLabelsData();
+                    // Its senseless to update data on simple tab change
+                    if (action !== ACTION_GOTO_T){
+                        // TODO: w2 ; xw2-w4 -> firefox NS_ERROR_NOT_INTIALIZED after closing last window
+                        this.parent.events.subscribeTabEvents();
+                        WindowsManager.events.allowUpdatingLablesData();
+                        WindowsManager.updateLabelsData();
+                        this.parent.updateLabelsData();
+                    }
                     this.parent.commandsHistory.push({command:cmd, 
                                                         executionState:execState, 
                                                         executionMsg:execMsg}); 
@@ -1252,14 +1265,14 @@ this.TabsManager = {
                 endValue;
             console.log("In ProccedRange func");
             
-            if (range[rBegin].charAt(0) == "g" && range[rBegin].charAt(0) == "g"){
+            if (range[rBegin].charAt(0) == "g" && range[rEnd].charAt(0) == "g"){
                 // Extract "g" classifier
                 range[rBegin] = range[rBegin].replace("g", "");
                 range[rEnd] = range[rEnd].replace("g", "");
                 prefix = "g";
             }
 
-            if (range[rBegin].charAt(0) == "w" && range[rBegin].charAt(0) == "w"){
+            if (range[rBegin].charAt(0) == "w" && range[rEnd].charAt(0) == "w"){
                 // Extract "w" classifier
                 range[rBegin] = range[rBegin].replace("w", "");
                 range[rEnd] = range[rEnd].replace("w", "");
