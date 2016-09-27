@@ -103,35 +103,35 @@ Examples:
 
 ## Useful examples            
 
- - `23` - switch to tab with index 23;
- - `w5` - switch to window with index 5;
- - `g7` - switch to group with index 7; 
- - `c` - create new tab;
- - `cw` - create new window;
- - `xw` - close current window;
- - `xw2-w5` - close windows from 2 to 5;
- - `x22,34,45-60!51` - close tabs 22,23, from 45 to 60, except 51;
  - `b` - bookmark current tab;
- - `b1-e/toRead/genetics/` - bookmark tabs from first to last into folder tree "toRead"->"genetics";
- - `x"youtube.com"` - close all tabs with opened youtube.com site;
- - `x""` - close all tabs with currenly opened host (like youtube.com etc);
- - `x""3` - close all tabs with host, opened in tab with index 3;
- - `x-e` - close all tabs from current(including) to the end;
- - `x-e!` - close all tabs from current(excluding) to the end;
- - `x-e!"youtube.com"` - close all tabs from current to the end, except tabs with opened youtube.com;
- - `m25@1` - move tab with index 25 on to position 1;
- - `m@e` - move current tab to the end;
- - `m<.pdf>w3` - move all tabs with ".pdf" word in title to the window 3;
- - `m<funny & cats>,<funny & dogs>w2` - move all tabs with words in title "funny " AND " cats" or "funny " AND " dogs" to the window 2 (note spaces usage);
+ - `c` - create new tab;
+ - `23` - switch to tab with index 23;
  - `cg` - create new tabs group;
- - `x1-e!"google.com","wikipedia.org",<work>` - close tabs from first to the last one, except tabs with opened google.com site, wikipedia.org site, and except tabs with word "work" in title;
- - `lw` - list currently opened windows with index info;
+ - `cw` - create new window;
+ - `g7` - switch to group with index 7; 
  - `lg` - list currently opened groups with index info;
- - `x22-35,w1,g5` - close tabs from 22 to 35, also close window 1 and group 5;
+ - `lw` - list currently opened windows with index info;
+ - `w5` - switch to window with index 5;
+ - `xw` - close current window;
+ - `m@e` - move current tab to the end;
+ - `x""` - close all tabs with currenly opened host (like youtube.com etc);
+ - `x-e` - close all tabs from current(including) to the end;
  - `p1-3` - toggle pinning of tabs from 1 to 3;
- - `r"github.com"` - reload all tabs, with github.com site;
  - `s1-e` - stop loading of the tabs from first to the last;
- - `x""5,""2,<cooking>!23-40` - close all tabs with hosts, opened in tab 5 and in tab 2, also close tabs with word "cooking" in title, but exclude from closing tabs from 23 to 40.
+ - `x""3` - close all tabs with host, opened in tab with index 3;
+ - `x-e!` - close all tabs from current(excluding) to the end;
+ - `m25@1` - move tab with index 25 on to position 1;
+ - `xw2-w5` - close windows from 2 to 5;
+ - `m<.pdf>w3` - move all tabs with ".pdf" word in title to the window 3;
+ - `x22-35,w1,g5` - close tabs from 22 to 35, also close window 1 and group 5;
+ - `r"github.com"` - reload all tabs, with github.com site;
+ - `x"youtube.com"` - close all tabs with opened youtube.com site;
+ - `x22,34,45-60!51` - close tabs 22,23, from 45 to 60, except 51;
+ - `x-e!"youtube.com"` - close all tabs from current to the end, except tabs with opened youtube.com;
+ - `b1-e/toRead/genetics/` - bookmark tabs from first to last into folder tree "toRead"->"genetics";
+ - `x""5,""2,<cooking>!23-40` - close all tabs with hosts, opened in tab 5 and in tab 2, also close tabs with word "cooking" in title, but exclude from closing tabs from 23 to 40;
+ - `m<funny & cats>,<funny & dogs>w2` - move all tabs with words in title "funny " AND " cats" or "funny " AND " dogs" to the window 2 (note spaces usage);
+ - `x1-e!"google.com","wikipedia.org",<work>` - close tabs from first to the last one, except tabs with opened google.com site, wikipedia.org site, and except tabs with word "work" in title.
 
 ***
 
