@@ -182,7 +182,6 @@ commandsPopup.port.on("can-be-hiden", function (){
 });
 
 //=============================================================================
-// TODO: Do index remapping on window close, update button badges
 var WindowsManager = {
     windowEnum : Services.wm.getEnumerator(BROWSER),
     init : function() {
@@ -230,6 +229,15 @@ var WindowsManager = {
     
     get handlingWindows() {
         return this.windowToManagerMap.keys();
+    },
+
+    get countOfWindows() {
+        return this.handlingWindows.length;  
+    },
+
+    updateLabelsData : function(){
+        this.doIndexIdRemaping();
+        this.UIChanger.paintWindowLabels();
     },
 
     doIndexIdRemaping : function(){
@@ -342,6 +350,15 @@ var WindowsManager = {
         }
     },
 
+    UIChanger : {
+        paintWindowLabels : function(){
+            for (let window of WindowsManager.handlingWindows){
+                setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
+            }
+        }
+    },
+
+    // TODO: Disable listener on set of actions, or do not update windows map untill finish (in such cases)
     events : {
         windowListener : {
             onOpenWindow : function (xulWindow) {
@@ -361,17 +378,15 @@ var WindowsManager = {
                         // =================================
                         WindowsManager.doIndexIdRemaping();
                         setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
-                        // let { getActiveView }=require("sdk/view/core");
                         const toWidgetId = id =>
                                       ('action-button--browser-puppeteer-' + id);
                         const buttonView = require('sdk/ui/button/view');
                         buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
-                        // getActiveView(groupStateBtn, window).style.display = 'none';
-                        // viewFor(groupStateBtn).style.display = "none";
                     }
                 }
                 window.addEventListener("load",onWindowLoad);
             },
+
             onCloseWindow : function (xulWindow) {
                 // Temp bug fix: hide popup before closing to avoid its destruction
                 commandsPopup.hide();
@@ -384,7 +399,10 @@ var WindowsManager = {
 
                 let idToDelete = WindowsManager.actions.getWindowId(window);
                 WindowsManager.idToWindowMap.delete(idToDelete);
+
+                WindowsManager.updateLabelsData();
             },
+
             onWindowTitleChange : function (aWindow, aTitle) {
             }
         }
@@ -469,7 +487,6 @@ this.TabsManager = {
     },
 
     get currentGroup () {
-        let winGr = null, groupGr = null;
         if (this.ownerWindow.TabView == null || this.ownerWindow.TabView._window == null) {
             return this.getDefaultGroup();
         }else{
@@ -597,6 +614,11 @@ this.TabsManager = {
         let index = this.activeIdToIndexMap[currentTab.linkedPanel];
         let strIndex = index.toString();
         return strIndex;
+    },
+
+    getCurrentGroupIndex : function(){
+        return this.groupItems.getActiveGroupItem().id;
+        // return this.currentGroup.id.toString();
     },
 
     isLastTab : function(tab){
@@ -920,7 +942,17 @@ this.TabsManager = {
         
         closeGroup : function(id){
             let numberId = parseInt(id);
-            this.parent.groupItems._items.get(numberId).close();
+            let groupToClose = this.parent.groupItems._items.get(numberId);
+
+            // If need to close current group, then try to switch nearest left one
+            if (numberId == this.parent.getCurrentGroupIndex()) {
+                let inReverseOrder = true;
+                let nextGroupItemTab = this.parent.groupItems.getNextGroupItemTab(inReverseOrder);
+                this.parent.ownerWindow.TabView._window.UI.goToTab(nextGroupItemTab);
+                this.parent.groupItems.updateActiveGroupItemAndTabBar(nextGroupItemTab);
+            } 
+
+            groupToClose.tryToClose();
             // TODO: Remove current group from map 
             // TODO: Add tab remove group closing listeners
         },
@@ -1086,7 +1118,7 @@ this.TabsManager = {
             }else if (target == T_WINDOW){
                 target += WindowsManager.actions.getCurrentWindowIndex();
             }else if (target == T_GROUP){
-                // target += this.parent.getCurrentGroupIndex();
+                target += this.parent.getCurrentGroupIndex();
             } 
 
             aParams.mapCopy = Object.assign({}, this.parent.activeIndexToIdMap);
@@ -1157,7 +1189,7 @@ this.TabsManager = {
                 }
                 commandsPopup.port.once("progressChanged", runLoop.bind(null, aParams, i+1));
                 commandsPopup.port.emit("progressChange", i, aParams.valueArray.length);
-                if (i == aParams.valueArray.length-1){
+                if (i == aParams.valueArray.length - 1){
                     this.parent.events.subscribeTabEvents();
                     this.parent.updateLabelsData();
                     this.parent.commandsHistory.push({command:cmd, 
@@ -1237,15 +1269,15 @@ this.TabsManager = {
             // TODO: Add support for "w" and "g" -> xw-w5, xw5-w, x-w5 ?
             switch (prefix) {
                 case T_GROUP:
-                    // beginValue = ;
-                    // beginValue = ;
-                    break;
-                case T_WINDOW:
-                    // startValue = ;
+                    startValue = this.parent.getCurrentGroupIndex();
                     // endValue = ;
                     break;
+                case T_WINDOW:
+                    startValue = WindowsManager.actions.getCurrentWindowIndex();
+                    endValue = WindowsManager.countOfWindows;
+                    break;
                 default:
-                    beginValue = this.parent.getCurrentTabIndex();
+                    startValue = this.parent.getCurrentTabIndex();
                     endValue = this.parent.countOfTabs;
             }
             
@@ -1260,7 +1292,7 @@ this.TabsManager = {
             //  x-15 -> close from current to 15th tab, x5- -> close from 5th to current etc
             if (range[rBegin] == "" || range[rEnd] == ""){
                 // let index = this.parent.getCurrentTabIndex();
-                let index = beginValue; 
+                let index = startValue; 
                 if(range[rBegin] == "" )
                     range[rBegin] = index;
                 else
@@ -1414,6 +1446,8 @@ this.TabsManager = {
                     _target = this.parent.getCurrentTabIndex();
                 if (_target == "w")
                     _target = T_WINDOW + WindowsManager.actions.getCurrentWindowIndex();
+                if (_target == "g")
+                    _target = T_GROUP + this.parent.getCurrentGroupIndex();
                 _valueArr.push(_target);
             }
             return _valueArr;
