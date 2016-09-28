@@ -116,25 +116,32 @@ self.port.on("requestData-arrived", function onReqDataArrive(info){
 self.port.on("task-completed", function onTaskCompleted(){
     self.port.emit("can-be-hiden");
     removeChilds(dataContainer);
-    removeChilds(histContainer);
+    // removeChilds(histContainer);
     textInput.value = '';
     dataContainer.setAttribute('tabindex','-1');
 	fixPopupSize();
 });
 
 self.port.on("historyData-arrived", function onHistDataArrive(data){
-    removeChilds(histContainer);
 
-    let label = document.createElement('label');
-    label.innerHTML = "History: " 
-        + "<div class='histCmdOK histCmd infoBar'>&nbsp</div> - OK, "
-        + "<div class='histCmdERR histCmd infoBar'></div> - Error, " 
-        + "<div class='histCmdPartialOK histCmd infoBar'></div> - partial OK";
-    histContainer.appendChild(label);
+    let list = document.getElementById("history-list");
+    if (!list){
+        list = document.createElement('ul');
+        list.id = "history-list";
+    }
 
-    let list = document.createElement('ul');
+    let listLen = list.childNodes.length;
     let dataLen = data.length;
-    for (let i=dataLen-1; i>=0; i--){
+    let diff = dataLen - listLen;
+    // If actual commands hist is shorter, than displayed,
+    // we probaly are in widow with another history, so
+    // clear all previous data, and add all new data with help of diff modification
+    if (diff < 0){
+        removeChilds(list);
+        diff = dataLen;
+    }
+
+    for (let i = dataLen - diff; i < dataLen; i++){
         let item = document.createElement('li');
         let cmdResult = data[i];
         item.textContent = cmdResult.command;
@@ -148,7 +155,7 @@ self.port.on("historyData-arrived", function onHistDataArrive(data){
         let msgAttr = document.createAttribute("message");
         msgAttr.value = cmdResult.executionMsg;
         item.setAttributeNode(msgAttr);
-        list.appendChild(item);
+        list.insertBefore(item, list.firstChild);
     }
     histContainer.appendChild(list);
 
