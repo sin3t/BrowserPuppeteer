@@ -1,5 +1,5 @@
 # BrowserPuppeteer v0.1.0pre-alpha - Firefox extension 
-Complete text command-based extention to control browser. It provides tab numbering functionality, allows user to quickly jump from tab-to-tab within numbers. 
+Complete text command-based extension to control browser. It provides tab numbering functionality, allows user to quickly jump from tab-to-tab within numbers. 
 
 ## Features
 1. Tabs, windows and groups numbering

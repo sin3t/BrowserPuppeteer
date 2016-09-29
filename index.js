@@ -17,6 +17,8 @@ const
     DELIM_EXCLUDING = '!',
     DELIM_TITLE_LEFT = '<',
     DELIM_TITLE_RIGHT = '>',
+    DELIM_LIMIT_LEFT = '[',
+    DELIM_LIMIT_RIGHT = ']',
     DELIM_AND_CONDITION = '&',
     DELIM_PLACE_AFTER = 'a',
     DELIM_PLACE_BEFORE = 'b',
@@ -38,8 +40,10 @@ const
     ACTION_GOTO_G = "g",
     ACTION_GOTO_T = "",
     ACTION_GOTO_W = "w",
+    ACTION_DUMP = "d",
     ACTION_MOVE = "m",
     ACTION_ALIAS = "a",
+    ACTION_OPEND = "o",
     ACTION_SEARCH = "?",
     ACTION_BOOKMARK = "b",
     ACTION_UNLOAD_T = "u",
@@ -56,12 +60,12 @@ const
     TABLABEL_STYLE_COLOR = '#FFFFFF',
     TABLABEL_STYLE_FONTSIZE = '11px',
     TABLABEL_STYLE_MINWIDTH = '14px',
-    TABLABEL_STYLE_PINNED_MINWIDTH = '9px',
     TABLABEL_STYLE_MINHEIGHT = '14px',
     TABLABEL_STYLE_TEXTALIGN = 'center',
     TABLABEL_STYLE_ANIMATION = 'none',
     TABLABEL_STYLE_FONTWEIGHT = 'bold',
     TABLABEL_STYLE_BORDERRADIUS = '2px',
+    TABLABEL_STYLE_PINNED_MINWIDTH = '9px',
     TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000';
 
 
@@ -143,9 +147,10 @@ var commandsPopup = require("sdk/panel").Panel({
                    "{width: document.documentElement.clientWidth, " +
                    "height: document.documentElement.clientHeight});",
 });
+
+// Add tooltip element to Panel item (it not exists in default Panel state)
 let { getActiveView }=require("sdk/view/core");
 getActiveView(commandsPopup).querySelector("iframe").setAttribute("tooltip", "aHTMLTooltip");
-
 
 function currentManager(){
     return WindowsManager.windowToManagerMap.get(WindowsManager.actions.getCurrentWindow());
@@ -244,7 +249,7 @@ var WindowsManager = {
         }
     },
 
-    // TODO: Display counf of current grouptabs/ all group tabs count
+    // TODO: Display count of current grouptabs/ all group tabs count
     getCompleteInfoTable : function() {
         let dataArray = [];
         let headers = {windowH:"ID", countOfTabsH:"Tabs Σ", titleH:"Window title", thumbH:"Thumb"};
@@ -358,7 +363,6 @@ var WindowsManager = {
         }
     },
 
-    // TODO: Disable listener on set of actions, or do not update windows map untill finish (in such cases)
     events : {
         mustUpdateIndexes : true,
         disallowUpdatingLabelsData : function(){
@@ -624,7 +628,6 @@ this.TabsManager = {
 
     getCurrentGroupIndex : function(){
         return this.groupItems.getActiveGroupItem().id;
-        // return this.currentGroup.id.toString();
     },
 
     isLastTab : function(tab){
@@ -899,7 +902,6 @@ this.TabsManager = {
 
         changeGroupAt : function(id){
             //  if(!Tabs.hasHidden()) { return; }
-            // ui.setActive(gri._items.get(2))
             let numberId = parseInt(id);
             this.parent.ownerWindow.TabView._window.UI.goToTab(
                 this.parent.groupItems._items.get(numberId)
@@ -962,21 +964,6 @@ this.TabsManager = {
             // TODO: Remove current group from map 
             // TODO: Add tab remove group closing listeners
         },
-
-        searchTabByTitle : function(target, aParams){
-            let title = aParams.path.valueArray[0];
-            let _returnArr = [];
-
-            for (let tab of this.parent.gBrowser.visibleTabs){
-                if (tab.label.search(title) != -1){
-                    _returnArr.push({index:this.parent.activeIdToIndexMap[tab.linkedPanel],
-                                    title:tab.label});
-                }
-            }
-            console.log(_returnArr.toSource());
-            return _returnArr;
-        }
-        
     },
 
     events : {
@@ -1083,8 +1070,8 @@ this.TabsManager = {
                         break;
                 case ACTION_ALIAS:
                         break;
-                case ACTION_SEARCH:
-                        doAction.forTab = tabActs.searchTabByTitle.bind(tabActs);
+                // case ACTION_SEARCH:
+                //         doAction.forTab = tabActs.searchTabByTitle.bind(tabActs);
                         // doAction.forGroup = tabActs.searchGroupByTitle.bind(tabActs);
                         // doAction.forWindow = winActs.searchWindowByTitle.bind(tabActs);
                         break;
@@ -1106,8 +1093,8 @@ this.TabsManager = {
             let path = this.hasPath(target);
             if (path){
                 target = target.replace(path.rawData, '');
-                console.log("PATH.array:" + path.pathArray);
-                console.log("TARGET:" + target);
+                // console.log("PATH.array:" + path.pathArray);
+                // console.log("TARGET:" + target);
             }
             let excluding = this.hasExcludeList(target);
             if (excluding){
@@ -1181,7 +1168,7 @@ this.TabsManager = {
                 if (i == aParams.valueArray.length) return;
             
                 let value = aParams.valueArray[i];
-                console.log("Value to act is :" + value);
+                // console.log("Value to act is :" + value);
                 let valueType = this.getArgumentType(value);
                 try{
                     switch(valueType){
@@ -1263,20 +1250,20 @@ this.TabsManager = {
             let prefix = "";
             let startValue,
                 endValue;
-            console.log("In ProccedRange func");
+            // console.log("In ProccedRange func");
             
-            if (range[rBegin].charAt(0) == "g" && range[rEnd].charAt(0) == "g"){
-                // Extract "g" classifier
-                range[rBegin] = range[rBegin].replace("g", "");
-                range[rEnd] = range[rEnd].replace("g", "");
-                prefix = "g";
+            if (range[rBegin].charAt(0) == T_GROUP && range[rEnd].charAt(0) == T_GROUP){
+                // Extract T_GROUP classifier
+                range[rBegin] = range[rBegin].replace(T_GROUP, "");
+                range[rEnd] = range[rEnd].replace(T_GROUP, "");
+                prefix = T_GROUP;
             }
 
-            if (range[rBegin].charAt(0) == "w" && range[rEnd].charAt(0) == "w"){
-                // Extract "w" classifier
-                range[rBegin] = range[rBegin].replace("w", "");
-                range[rEnd] = range[rEnd].replace("w", "");
-                prefix = "w";
+            if (range[rBegin].charAt(0) == T_WINDOW && range[rEnd].charAt(0) == T_WINDOW){
+                // Extract T_WINDOW classifier
+                range[rBegin] = range[rBegin].replace(T_WINDOW, "");
+                range[rEnd] = range[rEnd].replace(T_WINDOW, "");
+                prefix = T_WINDOW;
             }
 
             // TODO: Add support for "w" and "g" -> xw-w5, xw5-w, x-w5 ?
@@ -1310,14 +1297,14 @@ this.TabsManager = {
                     range[rBegin] = index;
                 else
                     range[rEnd] = index;    
-                console.log("Extend empty range with index:" + index);
+                // console.log("Extend empty range with index:" + index);
             }
 
             // Provide reverse ranges 150-12, e-15 etc
             if (Number(range[rBegin]) > Number(range[rEnd])){
                 [ range[rBegin], range[rEnd] ] = [ range[rEnd], range[rBegin] ]; 
             }
-            console.log("so range[B]=" + range[rBegin] + " and range[E]=" + range[rEnd]);
+            // console.log("so range[B]=" + range[rBegin] + " and range[E]=" + range[rEnd]);
             // TODO: Fix group numeration bug: we work with native groups ID, 
             //          so definately there will be
             //      id skipping -> 3,4,5,7. In such case we cannt simply inc 
@@ -1325,7 +1312,7 @@ this.TabsManager = {
             // TODO: Add panel groupView update on group clossing?
             // Number-Number - is temp fix, need to do some with chars/numbers scenarios
             for (let targetIndex = range[rBegin]; Number(targetIndex) <= Number(range[rEnd]); targetIndex++){
-                console.log("In changed range loop, range part id :" + targetIndex); 
+                // console.log("In changed range loop, range part id :" + targetIndex); 
                 valueArr.push(prefix + targetIndex.toString());
             }
             return valueArr;
@@ -1333,10 +1320,10 @@ this.TabsManager = {
 
 
         extractHostValues : function(str){
-            console.log("=======================");
-            console.log("Argumebbt str:" + str + " and str.length:" + str.length);
+            // console.log("=======================");
+            // console.log("Argumebbt str:" + str + " and str.length:" + str.length);
             let hostToAct = (str == "") ? this.parent.actions.getRootURI(this.parent.getCurrentTab()) : str;
-            console.log("   after repair, hostToAct:" + hostToAct);
+            // console.log("   after repair, hostToAct:" + hostToAct);
 
             let tabs = this.parent.visibleTabs;
             let indexesToAct = [];
@@ -1415,9 +1402,9 @@ this.TabsManager = {
                 let _placeIndex = _rawData.slice(1, _rawData.length);
                 if (_placeIndex == "e")
                     _placeIndex = this.parent.countOfTabs;
-                console.log("In hasPlacing, placing:" + _rawData);
-                console.log("   placeIndex:" + _placeIndex);
-                console.log("   tabToPlace:" + _placeIndex);
+                // console.log("In hasPlacing, placing:" + _rawData);
+                // console.log("   placeIndex:" + _placeIndex);
+                // console.log("   tabToPlace:" + _placeIndex);
                 return { rawData : _rawData
                         ,behavior : _behavior 
                         ,placeIndex : _placeIndex}; 
@@ -1431,17 +1418,17 @@ this.TabsManager = {
             let _valueArr = [];
             let sv = this.hasSeveralValues(_target);
             let rg = this.isRange(_target);
-            let sd = this.hasHostData(_target);
+            let hd = this.hasHostData(_target);
             let td = this.hasTitleData(_target);
             if (sv){
                 for (let value of sv){
                     let rg = this.isRange(value);
-                    let sd = this.hasHostData(value);
+                    let hd = this.hasHostData(value);
                     let td = this.hasTitleData(value);
                     if(rg){
                         _valueArr.push(...this.extractRangeValues(rg));
-                    }else if (sd != null && (sd == "" || sd.length > 0)){
-                        _valueArr.push(...this.extractHostValues(sd));
+                    }else if (hd != null && (hd == "" || hd.length > 0)){
+                        _valueArr.push(...this.extractHostValues(hd));
                     }else if (td){
                         _valueArr.push(...this.extractTitleValues(td));
                     }else{ 
@@ -1450,8 +1437,8 @@ this.TabsManager = {
                 }
             }else if (rg) {
                 _valueArr.push(...this.extractRangeValues(rg));
-            }else if (sd != null && (sd == "" || sd.length > 0)){
-                _valueArr.push(...this.extractHostValues(sd));
+            }else if (hd != null && (hd == "" || hd.length > 0)){
+                _valueArr.push(...this.extractHostValues(hd));
             }else if (td) {
                 _valueArr.push(...this.extractTitleValues(td));
             }else{
@@ -1467,13 +1454,13 @@ this.TabsManager = {
         },
 
         hasExcludeList : function(arg){
-            console.log("In hasExclude list");
+            // console.log("In hasExclude list");
             let _arr;
             let splitResult = arg.split(DELIM_EXCLUDING);
             if (splitResult.length > 1){
                 let _target = splitResult[1];
                 _arr = this.getSimplifiedArray(_target);
-                console.log("   and wanna return _arr:" + _arr);
+                // console.log("   and wanna return _arr:" + _arr);
                 return { rawData : _target 
                         ,valueArray : _arr};
             }else{
@@ -1482,10 +1469,10 @@ this.TabsManager = {
         },
 
         hasHostData : function(arg){
-            console.log("In hasHostData, arg is :" + arg);
+            // console.log("In hasHostData, arg is :" + arg);
             let results = arg.split('"');
-            console.log("In is hasHostData " + results);
-            console.log("   and results.length=" + results.length);
+            // console.log("In is hasHostData " + results);
+            // console.log("   and results.length=" + results.length);
             if (results.length > 2){
                 let possibleHost = results[1];
                 let possibleIndexOfHost = (results[0] == "") ? results[2] : results[0]; //9"" or ""9
@@ -1501,7 +1488,7 @@ this.TabsManager = {
         },
 
         hasTitleData : function(arg){
-            console.log("In hasTitleWord, arg is:" + arg);
+            // console.log("In hasTitleWord, arg is:" + arg);
             
             let tBegin = arg.indexOf(DELIM_TITLE_LEFT);
             let tEnd = arg.indexOf(DELIM_TITLE_RIGHT);
@@ -1517,8 +1504,8 @@ this.TabsManager = {
         //=== is[a] ===
         isRange : function(arg){
             let range = arg.split(DELIM_RANGE);
-            console.log("In is IsRange " + range);
-            console.log("RANGE: All tabs map:" + this.parent.activeIndexToIdMap);
+            // console.log("In is IsRange " + range);
+            // console.log("RANGE: All tabs map:" + this.parent.activeIndexToIdMap);
             return range.length > 1 ? range : null;
         },
 
@@ -1700,7 +1687,7 @@ function handleScrollEvent(px) {
     // scrollWidth <- maxixmum scroll width
     // scrollByPixels(50,0) <- scroll relative to current position
     // tabScrollBox.scrollByPixels(-50,0);
-    tabScrollBox.scrollByPixels(px,px);
+    tabScrollBox.scrollByPixels(px,3*px);
 }
 //== WindowsManager initialization ============================================
 
