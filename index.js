@@ -1,10 +1,12 @@
-const TABINDEX_ANONID = 'tabindex';
 const XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 const 
     BROWSER = 'navigator:browser',
     NEWTAB_URL = 'about:home',
     NEWTAB_BLANK_URL = 'about:blank',
+
+    TABINDEX_ANONID = 'tabindex',
+    TABINDEX_LAYER_ANONID = 'tabindex-layer',
 
     SCROLL_STEP = 50,
     TABVIEW_POLLING_TIME = 1000,
@@ -57,6 +59,7 @@ const
     COMMANDSPOPUP_HEIGHT = 50,
 
     TABLABEL_POSITION = '950',
+    TABLABEL_ALIGN = 'center',
     TABLABEL_STYLE_COLOR = '#FFFFFF',
     TABLABEL_STYLE_FONTSIZE = '11px',
     TABLABEL_STYLE_MINWIDTH = '14px',
@@ -65,8 +68,15 @@ const
     TABLABEL_STYLE_ANIMATION = 'none',
     TABLABEL_STYLE_FONTWEIGHT = 'bold',
     TABLABEL_STYLE_BORDERRADIUS = '2px',
-    TABLABEL_STYLE_PINNED_MINWIDTH = '9px',
-    TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000';
+    TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000',
+
+    PINNED_TABLABEL_STYLE_MINWIDTH = '9px',
+    PINNED_TABLABEL_STYLE_MINHEIGHT = '9px',
+    PINNED_TABLABEL_STYLE_FONTSIZE = '7pt',
+
+    PINNED_TABLABEL_LAYER_STYLE_MARGINBOTTOM = '2px',
+    PINNED_TABLABEL_LAYER_PACK = 'end',
+    PINNED_TABLABEL_LAYER_ALIGN = 'end';
 
 
 const { Cc, Ci, Cm, Cu, Cr, components } = require("chrome");
@@ -1530,74 +1540,78 @@ this.TabsManager = {
 
         addLabel : function(tab, group = this.parent.currentGroup) {
             let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
+            let tabLabelLayer = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_LAYER_ANONID);
             let chromeDocument = tab.ownerDocument;
 
-            // console.log("addLabel: group.idToIndexMap:" + group.idToIndexMap.toSource());
-            // console.log("addLabel: group.indexToIdMap:" + group.indexToIdMap.toSource());
-
-            if (!tabLabel) {
-                let index = group.idToIndexMap[tab.linkedPanel];
-                // console.log("addLabel: adding for id:" + tab.linkedPanel + " an index:" + index);
+            if (!tabLabel){
                 tabLabel = chromeDocument.createElementNS(XULNS, 'label');
                 tabLabel.setAttribute('anonid',TABINDEX_ANONID);
+                tabLabel.setAttribute('align', TABLABEL_ALIGN);
+                tabLabel.setAttribute('ordinal', TABLABEL_POSITION);
                 tabLabel.className = 'tab-text';
-                tabLabel.setAttribute('align', 'right');
                 tabLabel.style.color = TABLABEL_STYLE_COLOR;
                 tabLabel.style.backgroundColor = TABLABEL_STYLE_BACKGROUNDCOLOR;
                 tabLabel.style.animation = TABLABEL_STYLE_ANIMATION;
-                tabLabel.setAttribute('ordinal', TABLABEL_POSITION);
-                tabLabel.setAttribute('value', index);
-
-                chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
-
-                 tabLabel.style.borderBottomLeftRadius =
+                tabLabel.style.borderBottomLeftRadius =
                              tabLabel.style.borderBottomRightRadius =
                              tabLabel.style.borderTopLeftRadius =
                              tabLabel.style.borderTopRightRadius = TABLABEL_STYLE_BORDERRADIUS;
-                tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
-                tabLabel.style.minHeight = TABLABEL_STYLE_MINHEIGHT;
                 tabLabel.style.textAlign = TABLABEL_STYLE_TEXTALIGN;
                 tabLabel.style.fontWeight = TABLABEL_STYLE_FONTWEIGHT;
-                tabLabel.style.fontSize = TABLABEL_STYLE_FONTSIZE;
-                if (tab.pinned){
-                    this.parent.actions.fixPinnedTabs();
-                    tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;   
+
+                // Perform pinning check before connecting with parent, because there can be 2 possible parents:
+                // 'tab-content' for simple tab with label index
+                // special layer with 'tab-stack' as parent, for pinned tab
+                if (!tab.pinned){
+                    chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
                 }
-
-                // layer tests WORKS!
-                // let tabLabelLayer;
-                // tabLabelLayer = chromeDocument.createElementNS(XULNS, 'xul:hbox');
-                // tabLabelLayer.setAttribute('align', 'right');
-                // tabLabelLayer.setAttribute('anonid', 'tablabel-id');
-                // tabLabelLayer.setAttribute('class', 'tab-content');
-                // tabLabelLayer.appendChild(tabLabel);
-                // chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-stack').appendChild(tabLabelLayer);
-                //            tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
-
-            } else {
-                this.updateLabel(tab, group);
             }
-        },
 
-        updateLabel : function(tab, group = this.parent.currentManager) {
-            let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
             let index = group.idToIndexMap[tab.linkedPanel];
-
             tabLabel.setAttribute('value', index);
-            if (tabLabel.parentNode.getAttribute('pinned') === 'true'){
+
+            if (tab.pinned){
                 this.parent.actions.fixPinnedTabs();
-                tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;
+                tabLabel.style.fontSize = PINNED_TABLABEL_STYLE_FONTSIZE;
+                tabLabel.style.minWidth = PINNED_TABLABEL_STYLE_MINWIDTH;   
+                tabLabel.style.minHeight = PINNED_TABLABEL_STYLE_MINHEIGHT;
+
+                if (!tabLabelLayer){
+                    tabLabelLayer = chromeDocument.createElementNS(XULNS, 'xul:hbox');
+                    tabLabelLayer.setAttribute('anonid', TABINDEX_LAYER_ANONID);
+                    tabLabelLayer.setAttribute('class', 'tab-content');
+                    tabLabelLayer.setAttribute('pack', PINNED_TABLABEL_LAYER_PACK);
+                    tabLabelLayer.setAttribute('align', PINNED_TABLABEL_LAYER_ALIGN);
+                    tabLabelLayer.style.marginBottom = PINNED_TABLABEL_LAYER_STYLE_MARGINBOTTOM;
+
+                    tabLabelLayer.appendChild(tabLabel);
+                    chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-stack').appendChild(tabLabelLayer);
+                }
             }else{
+                tabLabel.style.fontSize = TABLABEL_STYLE_FONTSIZE;
                 tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
+                tabLabel.style.minHeight = TABLABEL_STYLE_MINHEIGHT;
+
+                // If tab isn't pinned, but layers still exists - means, that it was pinned
+                // so we must change parent from layer to tab-content and remove layer itself
+                if (tabLabelLayer){
+                    chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
+                    tabLabelLayer.remove();
+                }
             }
+            tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
         },
 
         removeLabel : function(tab) {
             let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
             if (tabLabel){
-                tabLabel.parentNode.removeChild(tabLabel);  
+                let labelParent = tabLabel.parentNode;
+                labelParent.removeChild(tabLabel);
+                if (tab.pinned) // Layer is, remove it
+                    labelParent.parentNode.removeChild(labelParent);
             }
         },
+
         removeAllLabels : function() {
             let tabs = this.parent.gBrowser.tabs;
             for (let tab of tabs)
