@@ -4,9 +4,9 @@ Complete text command-based extension to control browser. It provides tab number
 ## Features
 1. Tabs, windows and groups numbering
 
- | Vertically aligned tabs | Horizontally aligned tabs |
- |:-----------------------:|:-------------------------:|
- ![Vertical numbered tabs][vertical tabs screenshot] | ![Horizontal numbered tabs][horizontal tabs screenshot]
+ | Vertically aligned tabs | Horizontally aligned tabs | Window/group |
+ |:-----------------------:|:-------------------------:|:------------:|
+ ![Vertical numbered tabs][vertical tabs screenshot] | ![Horizontal numbered tabs][horizontal tabs screenshot] | ![Current window/group buttons][state buttons screenshot]
  
  You can easily jump to that tabs by numbers, perform most of the available actions (See 3 section).
 
@@ -169,6 +169,7 @@ Examples:
 
 [vertical tabs screenshot]:/../screenshots/vertical_tabs_numbered.png?raw=true "Numbering for vertical tabs"
 [horizontal tabs screenshot]:/../screenshots/horizontal_tabs_numbered.png?raw=true "Numbering for horizontal tabs"
+[state buttons screenshot]:/../screenshots/state_buttons.png?raw=true "Current window/group buttons with identificators"
 [tabgroups link]:https://addons.mozilla.org/uk/firefox/addon/tab-groups-panorama/
 [commandspopup progress screenshot]:/../screenshots/cmd_progress_demo.png?raw=true "CommandsPopup with 'x10-e' - [Close tabs from 10 to the End] command output"
 [commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with 'lg' - [List Groups] command output"
