@@ -104,7 +104,7 @@ var IOService = Cc["@mozilla.org/network/io-service;1"]
 var windowStateBtn =  buttons.ActionButton({
     id: "window-button",
     label: "Window button",
-    icon: "./bsd.png",
+    icon: "./window.png",
     badge: "",
     badgeColor: TOOLBARBTN_STYLE_BADGECOLOR,
     onClick: function(){
@@ -120,7 +120,7 @@ var windowStateBtn =  buttons.ActionButton({
 var groupStateBtn =  buttons.ActionButton({
     id: "group-button",
     label: "Group button",
-    icon: "./bsd.png",
+    icon: "./tabgroups.png",
     badge: "",
     badgeColor: TOOLBARBTN_STYLE_BADGECOLOR,
     onClick: function(){
@@ -1599,7 +1599,7 @@ this.TabsManager = {
                     tabLabelLayer.remove();
                 }
             }
-            tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
+            // tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
         },
 
         removeLabel : function(tab) {
