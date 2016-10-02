@@ -1,9 +1,12 @@
-const TABINDEX_ANONID = 'tabindex';
 const XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 const 
     BROWSER = 'navigator:browser',
     NEWTAB_URL = 'about:home',
+    NEWTAB_BLANK_URL = 'about:blank',
+
+    TABINDEX_ANONID = 'tabindex',
+    TABINDEX_LAYER_ANONID = 'tabindex-layer',
 
     SCROLL_STEP = 50,
     TABVIEW_POLLING_TIME = 1000,
@@ -16,6 +19,8 @@ const
     DELIM_EXCLUDING = '!',
     DELIM_TITLE_LEFT = '<',
     DELIM_TITLE_RIGHT = '>',
+    DELIM_LIMIT_LEFT = '[',
+    DELIM_LIMIT_RIGHT = ']',
     DELIM_AND_CONDITION = '&',
     DELIM_PLACE_AFTER = 'a',
     DELIM_PLACE_BEFORE = 'b',
@@ -37,8 +42,10 @@ const
     ACTION_GOTO_G = "g",
     ACTION_GOTO_T = "",
     ACTION_GOTO_W = "w",
+    ACTION_DUMP = "d",
     ACTION_MOVE = "m",
     ACTION_ALIAS = "a",
+    ACTION_OPEND = "o",
     ACTION_SEARCH = "?",
     ACTION_BOOKMARK = "b",
     ACTION_UNLOAD_T = "u",
@@ -48,17 +55,28 @@ const
     ACTION_TOOGLE_PINNING = "p",
     ACTION_TREESTYLETAB_CONTROL = "t",
 
+    COMMANDSPOPUP_POSITION = 40,
+    COMMANDSPOPUP_HEIGHT = 50,
+
     TABLABEL_POSITION = '950',
+    TABLABEL_ALIGN = 'center',
     TABLABEL_STYLE_COLOR = '#FFFFFF',
     TABLABEL_STYLE_FONTSIZE = '11px',
     TABLABEL_STYLE_MINWIDTH = '14px',
-    TABLABEL_STYLE_PINNED_MINWIDTH = '9px',
     TABLABEL_STYLE_MINHEIGHT = '14px',
     TABLABEL_STYLE_TEXTALIGN = 'center',
     TABLABEL_STYLE_ANIMATION = 'none',
     TABLABEL_STYLE_FONTWEIGHT = 'bold',
     TABLABEL_STYLE_BORDERRADIUS = '2px',
-    TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000';
+    TABLABEL_STYLE_BACKGROUNDCOLOR = '#CC0000',
+
+    PINNED_TABLABEL_STYLE_MINWIDTH = '9px',
+    PINNED_TABLABEL_STYLE_MINHEIGHT = '9px',
+    PINNED_TABLABEL_STYLE_FONTSIZE = '7pt',
+
+    PINNED_TABLABEL_LAYER_STYLE_MARGINBOTTOM = '2px',
+    PINNED_TABLABEL_LAYER_PACK = 'end',
+    PINNED_TABLABEL_LAYER_ALIGN = 'end';
 
 
 const { Cc, Ci, Cm, Cu, Cr, components } = require("chrome");
@@ -86,7 +104,7 @@ var IOService = Cc["@mozilla.org/network/io-service;1"]
 var windowStateBtn =  buttons.ActionButton({
     id: "window-button",
     label: "Window button",
-    icon: "./bsd.png",
+    icon: "./window.png",
     badge: "",
     badgeColor: TOOLBARBTN_STYLE_BADGECOLOR,
     onClick: function(){
@@ -102,7 +120,7 @@ var windowStateBtn =  buttons.ActionButton({
 var groupStateBtn =  buttons.ActionButton({
     id: "group-button",
     label: "Group button",
-    icon: "./bsd.png",
+    icon: "./tabgroups.png",
     badge: "",
     badgeColor: TOOLBARBTN_STYLE_BADGECOLOR,
     onClick: function(){
@@ -130,18 +148,19 @@ function setBtnBadgeValue(btn, window, value){
 var data = require("sdk/self").data;
 var commandsPopup = require("sdk/panel").Panel({
     position: { 
-        top: 40, 
+        top: COMMANDSPOPUP_POSITION, 
     },
-    height:50,
+    height: COMMANDSPOPUP_HEIGHT,
     contentURL: data.url("commandsPopup.html"),
     contentScriptFile: data.url("commandsPopupLogic.js"),
     contentScript: "self.port.emit('resize', " +
                    "{width: document.documentElement.clientWidth, " +
                    "height: document.documentElement.clientHeight});",
 });
+
+// Add tooltip element to Panel item (it not exists in default Panel state)
 let { getActiveView }=require("sdk/view/core");
 getActiveView(commandsPopup).querySelector("iframe").setAttribute("tooltip", "aHTMLTooltip");
-
 
 function currentManager(){
     return WindowsManager.windowToManagerMap.get(WindowsManager.actions.getCurrentWindow());
@@ -178,7 +197,6 @@ commandsPopup.port.on("can-be-hiden", function (){
 });
 
 //=============================================================================
-// TODO: Do index remapping on window close, update button badges
 var WindowsManager = {
     windowEnum : Services.wm.getEnumerator(BROWSER),
     init : function() {
@@ -194,14 +212,8 @@ var WindowsManager = {
             this.windowToManagerMap.set(window, manager);
 
             this.idToWindowMap.set(windowId, window);
-            this.doIndexIdRemaping();
-            
-            setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
-            const toWidgetId = id =>
-                          ('action-button--browser-puppeteer-' + id);
-            const buttonView = require('sdk/ui/button/view');
-            buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
         }
+        this.updateLabelsData();
     },
 
     uninit : function() {
@@ -215,7 +227,6 @@ var WindowsManager = {
 
     windowToManagerMap : new Map(),
     idToWindowMap : new Map(),
-    openedWindows : [],
     tabsManagers : [],
     indexToIdMap : {},
     idToIndexMap : {},
@@ -226,6 +237,15 @@ var WindowsManager = {
     
     get handlingWindows() {
         return this.windowToManagerMap.keys();
+    },
+
+    get countOfWindows() {
+        return this.windowToManagerMap.size;  
+    },
+
+    updateLabelsData : function(){
+        this.doIndexIdRemaping();
+        this.UIChanger.paintWindowLabels();
     },
 
     doIndexIdRemaping : function(){
@@ -239,7 +259,7 @@ var WindowsManager = {
         }
     },
 
-    // TODO: Display counf of current grouptabs/ all group tabs count
+    // TODO: Display count of current grouptabs/ all group tabs count
     getCompleteInfoTable : function() {
         let dataArray = [];
         let headers = {windowH:"ID", countOfTabsH:"Tabs Σ", titleH:"Window title", thumbH:"Thumb"};
@@ -338,7 +358,31 @@ var WindowsManager = {
         }
     },
 
+    UIChanger : {
+        paintWindowLabels : function(){
+            // const toWidgetId = id =>
+            //               ('action-button--browser-puppeteer-' + id);
+            // const buttonView = require('sdk/ui/button/view');
+            for (let window of WindowsManager.handlingWindows){
+                setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
+                // buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
+                viewFor(windowStateBtn).style.fontWeight = "bold";
+                viewFor(groupStateBtn).style.fontWeight = "bold";
+                viewFor(groupStateBtn).style.display = "none";
+            }
+        }
+    },
+
     events : {
+        mustUpdateIndexes : true,
+        disallowUpdatingLabelsData : function(){
+            mustUpdateIndexes = false;
+        },
+
+        allowUpdatingLablesData : function(){
+            mustUpdateIndexes = true;
+        },
+
         windowListener : {
             onOpenWindow : function (xulWindow) {
                 var window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -355,19 +399,13 @@ var WindowsManager = {
 
                         WindowsManager.idToWindowMap.set(WindowsManager.actions.getWindowId(window), window);
                         // =================================
-                        WindowsManager.doIndexIdRemaping();
-                        setBtnBadgeValue(windowStateBtn, window, T_WINDOW + WindowsManager.actions.getWindowIndex(window));
-                        // let { getActiveView }=require("sdk/view/core");
-                        const toWidgetId = id =>
-                                      ('action-button--browser-puppeteer-' + id);
-                        const buttonView = require('sdk/ui/button/view');
-                        buttonView.nodeFor(toWidgetId(groupStateBtn.id), window).style.display = 'none';
-                        // getActiveView(groupStateBtn, window).style.display = 'none';
-                        // viewFor(groupStateBtn).style.display = "none";
+                        if (mustUpdateIndexes)
+                            WindowsManager.updateLabelsData();
                     }
                 }
                 window.addEventListener("load",onWindowLoad);
             },
+
             onCloseWindow : function (xulWindow) {
                 // Temp bug fix: hide popup before closing to avoid its destruction
                 commandsPopup.hide();
@@ -380,7 +418,11 @@ var WindowsManager = {
 
                 let idToDelete = WindowsManager.actions.getWindowId(window);
                 WindowsManager.idToWindowMap.delete(idToDelete);
+
+                if (mustUpdateIndexes)
+                    WindowsManager.updateLabelsData();
             },
+
             onWindowTitleChange : function (aWindow, aTitle) {
             }
         }
@@ -465,7 +507,6 @@ this.TabsManager = {
     },
 
     get currentGroup () {
-        let winGr = null, groupGr = null;
         if (this.ownerWindow.TabView == null || this.ownerWindow.TabView._window == null) {
             return this.getDefaultGroup();
         }else{
@@ -508,12 +549,13 @@ this.TabsManager = {
 
     // TODO: Dont add group buttons in windows without tabs
     // TODO: Set button style after every value change (because of own button restyling)
+    // TODO: Test solution with MutationOservers
     pollForTabView : function(){
         this.ownerWindow.setTimeout(() => {
             if (this.ownerWindow.TabView._window){
                 if (this.lastActiveGroupItem !== this.groupItems.getActiveGroupItem())
                     this.lastActiveGroupItem = this.groupItems.getActiveGroupItem();
-
+                 
                 setBtnBadgeValue(groupStateBtn, this.ownerWindow, T_GROUP + this.lastActiveGroupItem.id);
                 viewFor(groupStateBtn).style.display = "initial";
 
@@ -592,6 +634,10 @@ this.TabsManager = {
         let index = this.activeIdToIndexMap[currentTab.linkedPanel];
         let strIndex = index.toString();
         return strIndex;
+    },
+
+    getCurrentGroupIndex : function(){
+        return this.groupItems.getActiveGroupItem().id;
     },
 
     isLastTab : function(tab){
@@ -741,7 +787,7 @@ this.TabsManager = {
                 case DELIM_PLACE_WINDOW : 
                     // this.parent.gBrowser.replaceTabWithWindow(tabToMove); 
                     let window = WindowsManager.actions.getWindowAt(placeIndex);
-                    let newTab = window.gBrowser.addTab('about:blank');
+                    let newTab = window.gBrowser.addTab(NEWTAB_BLANK_URL);
                     newTab.linkedBrowser.webNavigation.stop(Ci.nsIWebNavigation.STOP_ALL);
                     window.gBrowser.swapBrowsersAndCloseOther(newTab, tabToMove);
                     window.gBrowser.selectedTab = newTab;
@@ -866,7 +912,6 @@ this.TabsManager = {
 
         changeGroupAt : function(id){
             //  if(!Tabs.hasHidden()) { return; }
-            // ui.setActive(gri._items.get(2))
             let numberId = parseInt(id);
             this.parent.ownerWindow.TabView._window.UI.goToTab(
                 this.parent.groupItems._items.get(numberId)
@@ -915,25 +960,20 @@ this.TabsManager = {
         
         closeGroup : function(id){
             let numberId = parseInt(id);
-            this.parent.groupItems._items.get(numberId).close();
+            let groupToClose = this.parent.groupItems._items.get(numberId);
+
+            // If need to close current group, then try to switch nearest left one
+            if (numberId == this.parent.getCurrentGroupIndex()) {
+                let inReverseOrder = true;
+                let nextGroupItemTab = this.parent.groupItems.getNextGroupItemTab(inReverseOrder);
+                this.parent.ownerWindow.TabView._window.UI.goToTab(nextGroupItemTab);
+                this.parent.groupItems.updateActiveGroupItemAndTabBar(nextGroupItemTab);
+            } 
+
+            groupToClose.tryToClose();
             // TODO: Remove current group from map 
             // TODO: Add tab remove group closing listeners
         },
-
-        searchTabByTitle : function(target, aParams){
-            let title = aParams.path.valueArray[0];
-            let _returnArr = [];
-
-            for (let tab of this.parent.gBrowser.visibleTabs){
-                if (tab.label.search(title) != -1){
-                    _returnArr.push({index:this.parent.activeIdToIndexMap[tab.linkedPanel],
-                                    title:tab.label});
-                }
-            }
-            console.log(_returnArr.toSource());
-            return _returnArr;
-        }
-        
     },
 
     events : {
@@ -966,7 +1006,7 @@ this.TabsManager = {
             }
         },
         subscribeTabEvents : function(){
-            if (!this.tabViewPollingFinished)
+            if (!this.parent.tabViewPollingFinished)
                 this.parent.pollForTabView();
             if (!this.isSubscripted){
                 this.examinedEvents.forEach(event => {
@@ -1040,8 +1080,8 @@ this.TabsManager = {
                         break;
                 case ACTION_ALIAS:
                         break;
-                case ACTION_SEARCH:
-                        doAction.forTab = tabActs.searchTabByTitle.bind(tabActs);
+                // case ACTION_SEARCH:
+                //         doAction.forTab = tabActs.searchTabByTitle.bind(tabActs);
                         // doAction.forGroup = tabActs.searchGroupByTitle.bind(tabActs);
                         // doAction.forWindow = winActs.searchWindowByTitle.bind(tabActs);
                         break;
@@ -1063,8 +1103,8 @@ this.TabsManager = {
             let path = this.hasPath(target);
             if (path){
                 target = target.replace(path.rawData, '');
-                console.log("PATH.array:" + path.pathArray);
-                console.log("TARGET:" + target);
+                // console.log("PATH.array:" + path.pathArray);
+                // console.log("TARGET:" + target);
             }
             let excluding = this.hasExcludeList(target);
             if (excluding){
@@ -1081,7 +1121,7 @@ this.TabsManager = {
             }else if (target == T_WINDOW){
                 target += WindowsManager.actions.getCurrentWindowIndex();
             }else if (target == T_GROUP){
-                // target += this.parent.getCurrentGroupIndex();
+                target += this.parent.getCurrentGroupIndex();
             } 
 
             aParams.mapCopy = Object.assign({}, this.parent.activeIndexToIdMap);
@@ -1129,6 +1169,7 @@ this.TabsManager = {
             let hasManyTargets = aParams.valueArray.length > 1;
             if (hasManyTargets){
                 this.parent.events.unsubscribeTabEvents();
+                WindowsManager.events.disallowUpdatingLabelsData();
             }
 
             let execState = EXEC_OK;
@@ -1137,7 +1178,7 @@ this.TabsManager = {
                 if (i == aParams.valueArray.length) return;
             
                 let value = aParams.valueArray[i];
-                console.log("Value to act is :" + value);
+                // console.log("Value to act is :" + value);
                 let valueType = this.getArgumentType(value);
                 try{
                     switch(valueType){
@@ -1151,10 +1192,16 @@ this.TabsManager = {
                      execState = EXEC_ERROR;
                 }
                 commandsPopup.port.once("progressChanged", runLoop.bind(null, aParams, i+1));
-                commandsPopup.port.emit("progressChange", i, aParams.valueArray.length);
-                if (i == aParams.valueArray.length-1){
-                    this.parent.events.subscribeTabEvents();
-                    this.parent.updateLabelsData();
+                commandsPopup.port.emit("progressChange", i, aParams.valueArray.length, cmd);
+                if (i == aParams.valueArray.length - 1){
+                    // Its senseless to update data on simple tab change
+                    if (action !== ACTION_GOTO_T){
+                        // TODO: w2 ; xw2-w4 -> firefox NS_ERROR_NOT_INTIALIZED after closing last window
+                        this.parent.events.subscribeTabEvents();
+                        WindowsManager.events.allowUpdatingLablesData();
+                        WindowsManager.updateLabelsData();
+                        this.parent.updateLabelsData();
+                    }
                     this.parent.commandsHistory.push({command:cmd, 
                                                         executionState:execState, 
                                                         executionMsg:execMsg}); 
@@ -1213,34 +1260,34 @@ this.TabsManager = {
             let prefix = "";
             let startValue,
                 endValue;
-            console.log("In ProccedRange func");
+            // console.log("In ProccedRange func");
             
-            if (range[rBegin].charAt(0) == "g" && range[rBegin].charAt(0) == "g"){
-                // Extract "g" classifier
-                range[rBegin] = range[rBegin].replace("g", "");
-                range[rEnd] = range[rEnd].replace("g", "");
-                prefix = "g";
+            if (range[rBegin].charAt(0) == T_GROUP && range[rEnd].charAt(0) == T_GROUP){
+                // Extract T_GROUP classifier
+                range[rBegin] = range[rBegin].replace(T_GROUP, "");
+                range[rEnd] = range[rEnd].replace(T_GROUP, "");
+                prefix = T_GROUP;
             }
 
-            if (range[rBegin].charAt(0) == "w" && range[rBegin].charAt(0) == "w"){
-                // Extract "w" classifier
-                range[rBegin] = range[rBegin].replace("w", "");
-                range[rEnd] = range[rEnd].replace("w", "");
-                prefix = "w";
+            if (range[rBegin].charAt(0) == T_WINDOW && range[rEnd].charAt(0) == T_WINDOW){
+                // Extract T_WINDOW classifier
+                range[rBegin] = range[rBegin].replace(T_WINDOW, "");
+                range[rEnd] = range[rEnd].replace(T_WINDOW, "");
+                prefix = T_WINDOW;
             }
 
             // TODO: Add support for "w" and "g" -> xw-w5, xw5-w, x-w5 ?
             switch (prefix) {
                 case T_GROUP:
-                    // beginValue = ;
-                    // beginValue = ;
-                    break;
-                case T_WINDOW:
-                    // startValue = ;
+                    startValue = this.parent.getCurrentGroupIndex();
                     // endValue = ;
                     break;
+                case T_WINDOW:
+                    startValue = WindowsManager.actions.getCurrentWindowIndex();
+                    endValue = WindowsManager.countOfWindows;
+                    break;
                 default:
-                    beginValue = this.parent.getCurrentTabIndex();
+                    startValue = this.parent.getCurrentTabIndex();
                     endValue = this.parent.countOfTabs;
             }
             
@@ -1255,19 +1302,19 @@ this.TabsManager = {
             //  x-15 -> close from current to 15th tab, x5- -> close from 5th to current etc
             if (range[rBegin] == "" || range[rEnd] == ""){
                 // let index = this.parent.getCurrentTabIndex();
-                let index = beginValue; 
+                let index = startValue; 
                 if(range[rBegin] == "" )
                     range[rBegin] = index;
                 else
                     range[rEnd] = index;    
-                console.log("Extend empty range with index:" + index);
+                // console.log("Extend empty range with index:" + index);
             }
 
             // Provide reverse ranges 150-12, e-15 etc
             if (Number(range[rBegin]) > Number(range[rEnd])){
                 [ range[rBegin], range[rEnd] ] = [ range[rEnd], range[rBegin] ]; 
             }
-            console.log("so range[B]=" + range[rBegin] + " and range[E]=" + range[rEnd]);
+            // console.log("so range[B]=" + range[rBegin] + " and range[E]=" + range[rEnd]);
             // TODO: Fix group numeration bug: we work with native groups ID, 
             //          so definately there will be
             //      id skipping -> 3,4,5,7. In such case we cannt simply inc 
@@ -1275,7 +1322,7 @@ this.TabsManager = {
             // TODO: Add panel groupView update on group clossing?
             // Number-Number - is temp fix, need to do some with chars/numbers scenarios
             for (let targetIndex = range[rBegin]; Number(targetIndex) <= Number(range[rEnd]); targetIndex++){
-                console.log("In changed range loop, range part id :" + targetIndex); 
+                // console.log("In changed range loop, range part id :" + targetIndex); 
                 valueArr.push(prefix + targetIndex.toString());
             }
             return valueArr;
@@ -1283,10 +1330,10 @@ this.TabsManager = {
 
 
         extractHostValues : function(str){
-            console.log("=======================");
-            console.log("Argumebbt str:" + str + " and str.length:" + str.length);
+            // console.log("=======================");
+            // console.log("Argumebbt str:" + str + " and str.length:" + str.length);
             let hostToAct = (str == "") ? this.parent.actions.getRootURI(this.parent.getCurrentTab()) : str;
-            console.log("   after repair, hostToAct:" + hostToAct);
+            // console.log("   after repair, hostToAct:" + hostToAct);
 
             let tabs = this.parent.visibleTabs;
             let indexesToAct = [];
@@ -1365,9 +1412,9 @@ this.TabsManager = {
                 let _placeIndex = _rawData.slice(1, _rawData.length);
                 if (_placeIndex == "e")
                     _placeIndex = this.parent.countOfTabs;
-                console.log("In hasPlacing, placing:" + _rawData);
-                console.log("   placeIndex:" + _placeIndex);
-                console.log("   tabToPlace:" + _placeIndex);
+                // console.log("In hasPlacing, placing:" + _rawData);
+                // console.log("   placeIndex:" + _placeIndex);
+                // console.log("   tabToPlace:" + _placeIndex);
                 return { rawData : _rawData
                         ,behavior : _behavior 
                         ,placeIndex : _placeIndex}; 
@@ -1381,17 +1428,17 @@ this.TabsManager = {
             let _valueArr = [];
             let sv = this.hasSeveralValues(_target);
             let rg = this.isRange(_target);
-            let sd = this.hasHostData(_target);
+            let hd = this.hasHostData(_target);
             let td = this.hasTitleData(_target);
             if (sv){
                 for (let value of sv){
                     let rg = this.isRange(value);
-                    let sd = this.hasHostData(value);
+                    let hd = this.hasHostData(value);
                     let td = this.hasTitleData(value);
                     if(rg){
                         _valueArr.push(...this.extractRangeValues(rg));
-                    }else if (sd != null && (sd == "" || sd.length > 0)){
-                        _valueArr.push(...this.extractHostValues(sd));
+                    }else if (hd != null && (hd == "" || hd.length > 0)){
+                        _valueArr.push(...this.extractHostValues(hd));
                     }else if (td){
                         _valueArr.push(...this.extractTitleValues(td));
                     }else{ 
@@ -1400,26 +1447,30 @@ this.TabsManager = {
                 }
             }else if (rg) {
                 _valueArr.push(...this.extractRangeValues(rg));
-            }else if (sd != null && (sd == "" || sd.length > 0)){
-                _valueArr.push(...this.extractHostValues(sd));
+            }else if (hd != null && (hd == "" || hd.length > 0)){
+                _valueArr.push(...this.extractHostValues(hd));
             }else if (td) {
                 _valueArr.push(...this.extractTitleValues(td));
             }else{
                 if (_target == "")
                     _target = this.parent.getCurrentTabIndex();
+                if (_target == "w")
+                    _target = T_WINDOW + WindowsManager.actions.getCurrentWindowIndex();
+                if (_target == "g")
+                    _target = T_GROUP + this.parent.getCurrentGroupIndex();
                 _valueArr.push(_target);
             }
             return _valueArr;
         },
 
         hasExcludeList : function(arg){
-            console.log("In hasExclude list");
+            // console.log("In hasExclude list");
             let _arr;
             let splitResult = arg.split(DELIM_EXCLUDING);
             if (splitResult.length > 1){
                 let _target = splitResult[1];
                 _arr = this.getSimplifiedArray(_target);
-                console.log("   and wanna return _arr:" + _arr);
+                // console.log("   and wanna return _arr:" + _arr);
                 return { rawData : _target 
                         ,valueArray : _arr};
             }else{
@@ -1428,10 +1479,10 @@ this.TabsManager = {
         },
 
         hasHostData : function(arg){
-            console.log("In hasHostData, arg is :" + arg);
+            // console.log("In hasHostData, arg is :" + arg);
             let results = arg.split('"');
-            console.log("In is hasHostData " + results);
-            console.log("   and results.length=" + results.length);
+            // console.log("In is hasHostData " + results);
+            // console.log("   and results.length=" + results.length);
             if (results.length > 2){
                 let possibleHost = results[1];
                 let possibleIndexOfHost = (results[0] == "") ? results[2] : results[0]; //9"" or ""9
@@ -1447,7 +1498,7 @@ this.TabsManager = {
         },
 
         hasTitleData : function(arg){
-            console.log("In hasTitleWord, arg is:" + arg);
+            // console.log("In hasTitleWord, arg is:" + arg);
             
             let tBegin = arg.indexOf(DELIM_TITLE_LEFT);
             let tEnd = arg.indexOf(DELIM_TITLE_RIGHT);
@@ -1463,8 +1514,8 @@ this.TabsManager = {
         //=== is[a] ===
         isRange : function(arg){
             let range = arg.split(DELIM_RANGE);
-            console.log("In is IsRange " + range);
-            console.log("RANGE: All tabs map:" + this.parent.activeIndexToIdMap);
+            // console.log("In is IsRange " + range);
+            // console.log("RANGE: All tabs map:" + this.parent.activeIndexToIdMap);
             return range.length > 1 ? range : null;
         },
 
@@ -1489,74 +1540,78 @@ this.TabsManager = {
 
         addLabel : function(tab, group = this.parent.currentGroup) {
             let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
+            let tabLabelLayer = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_LAYER_ANONID);
             let chromeDocument = tab.ownerDocument;
 
-            // console.log("addLabel: group.idToIndexMap:" + group.idToIndexMap.toSource());
-            // console.log("addLabel: group.indexToIdMap:" + group.indexToIdMap.toSource());
-
-            if (!tabLabel) {
-                let index = group.idToIndexMap[tab.linkedPanel];
-                // console.log("addLabel: adding for id:" + tab.linkedPanel + " an index:" + index);
+            if (!tabLabel){
                 tabLabel = chromeDocument.createElementNS(XULNS, 'label');
                 tabLabel.setAttribute('anonid',TABINDEX_ANONID);
+                tabLabel.setAttribute('align', TABLABEL_ALIGN);
+                tabLabel.setAttribute('ordinal', TABLABEL_POSITION);
                 tabLabel.className = 'tab-text';
-                tabLabel.setAttribute('align', 'right');
                 tabLabel.style.color = TABLABEL_STYLE_COLOR;
                 tabLabel.style.backgroundColor = TABLABEL_STYLE_BACKGROUNDCOLOR;
                 tabLabel.style.animation = TABLABEL_STYLE_ANIMATION;
-                tabLabel.setAttribute('ordinal', TABLABEL_POSITION);
-                tabLabel.setAttribute('value', index);
-
-                chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
-
-                 tabLabel.style.borderBottomLeftRadius =
+                tabLabel.style.borderBottomLeftRadius =
                              tabLabel.style.borderBottomRightRadius =
                              tabLabel.style.borderTopLeftRadius =
                              tabLabel.style.borderTopRightRadius = TABLABEL_STYLE_BORDERRADIUS;
-                tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
-                tabLabel.style.minHeight = TABLABEL_STYLE_MINHEIGHT;
                 tabLabel.style.textAlign = TABLABEL_STYLE_TEXTALIGN;
                 tabLabel.style.fontWeight = TABLABEL_STYLE_FONTWEIGHT;
-                tabLabel.style.fontSize = TABLABEL_STYLE_FONTSIZE;
-                if (tab.pinned){
-                    this.parent.actions.fixPinnedTabs();
-                    tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;   
+
+                // Perform pinning check before connecting with parent, because there can be 2 possible parents:
+                // 'tab-content' for simple tab with label index
+                // special layer with 'tab-stack' as parent, for pinned tab
+                if (!tab.pinned){
+                    chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
                 }
-
-                // layer tests WORKS!
-                // let tabLabelLayer;
-                // tabLabelLayer = chromeDocument.createElementNS(XULNS, 'xul:hbox');
-                // tabLabelLayer.setAttribute('align', 'right');
-                // tabLabelLayer.setAttribute('anonid', 'tablabel-id');
-                // tabLabelLayer.setAttribute('class', 'tab-content');
-                // tabLabelLayer.appendChild(tabLabel);
-                // chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-stack').appendChild(tabLabelLayer);
-                //            tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
-
-            } else {
-                this.updateLabel(tab, group);
             }
-        },
 
-        updateLabel : function(tab, group = this.parent.currentManager) {
-            let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
             let index = group.idToIndexMap[tab.linkedPanel];
-
             tabLabel.setAttribute('value', index);
-            if (tabLabel.parentNode.getAttribute('pinned') === 'true'){
+
+            if (tab.pinned){
                 this.parent.actions.fixPinnedTabs();
-                tabLabel.style.minWidth = TABLABEL_STYLE_PINNED_MINWIDTH;
+                tabLabel.style.fontSize = PINNED_TABLABEL_STYLE_FONTSIZE;
+                tabLabel.style.minWidth = PINNED_TABLABEL_STYLE_MINWIDTH;   
+                tabLabel.style.minHeight = PINNED_TABLABEL_STYLE_MINHEIGHT;
+
+                if (!tabLabelLayer){
+                    tabLabelLayer = chromeDocument.createElementNS(XULNS, 'xul:hbox');
+                    tabLabelLayer.setAttribute('anonid', TABINDEX_LAYER_ANONID);
+                    tabLabelLayer.setAttribute('class', 'tab-content');
+                    tabLabelLayer.setAttribute('pack', PINNED_TABLABEL_LAYER_PACK);
+                    tabLabelLayer.setAttribute('align', PINNED_TABLABEL_LAYER_ALIGN);
+                    tabLabelLayer.style.marginBottom = PINNED_TABLABEL_LAYER_STYLE_MARGINBOTTOM;
+
+                    tabLabelLayer.appendChild(tabLabel);
+                    chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-stack').appendChild(tabLabelLayer);
+                }
             }else{
+                tabLabel.style.fontSize = TABLABEL_STYLE_FONTSIZE;
                 tabLabel.style.minWidth = TABLABEL_STYLE_MINWIDTH;
+                tabLabel.style.minHeight = TABLABEL_STYLE_MINHEIGHT;
+
+                // If tab isn't pinned, but layers still exists - means, that it was pinned
+                // so we must change parent from layer to tab-content and remove layer itself
+                if (tabLabelLayer){
+                    chromeDocument.getAnonymousElementByAttribute(tab, 'class', 'tab-content').appendChild(tabLabel);
+                    tabLabelLayer.remove();
+                }
             }
+            // tabLabel.style.minWidth = tabLabel.clientHeight + 'px';
         },
 
         removeLabel : function(tab) {
             let tabLabel = tab.ownerDocument.getAnonymousElementByAttribute(tab,'anonid', TABINDEX_ANONID);
             if (tabLabel){
-                tabLabel.parentNode.removeChild(tabLabel);  
+                let labelParent = tabLabel.parentNode;
+                labelParent.removeChild(tabLabel);
+                if (tab.pinned) // Layer is, remove it
+                    labelParent.parentNode.removeChild(labelParent);
             }
         },
+
         removeAllLabels : function() {
             let tabs = this.parent.gBrowser.tabs;
             for (let tab of tabs)
@@ -1565,7 +1620,7 @@ this.TabsManager = {
     },  
 
 
-    init:function(){
+    init : function() {
         this.events.parent = this;
         this.actions.parent = this;
         this.dataParser.parent = this;
@@ -1576,14 +1631,6 @@ this.TabsManager = {
 }.init();
 }
 
-WindowsManager.init();
-Services.wm.addListener(WindowsManager.events.windowListener);
-
-// https://developer.mozilla.org/en-US/docs/Extensions/Common_causes_of_memory_leaks_in_extensions
-exports.onUnload = function (reason) {
-    Services.wm.removeListener(WindowsManager.events.windowListener);
-    WindowsManager.uninit();
-};
 
 //function count() {
 //  try { window.clearTimeout(count.timeout) } catch(e) {};
@@ -1611,7 +1658,7 @@ exports.onUnload = function (reason) {
 //  return Array.filter(getTabContainer(window).children, t => !t.closing);
 //}
 
-//== Hotkeys bindings ============================================
+//== Hotkeys bindings =========================================================
 var { Hotkey } = require("sdk/hotkeys");
 
 var showHotkey = Hotkey({
@@ -1642,7 +1689,7 @@ function correctId(tabId){
     return tabId.substring('panel'.length);
 }
 
-//================================================================
+//=============================================================================
 function handleScrollEvent(px) {
     var window = WindowsManager.actions.getCurrentWindow();
     var tabBrowser = window.document.getElementById('tabbrowser-tabs');
@@ -1654,11 +1701,19 @@ function handleScrollEvent(px) {
     // scrollWidth <- maxixmum scroll width
     // scrollByPixels(50,0) <- scroll relative to current position
     // tabScrollBox.scrollByPixels(-50,0);
-    tabScrollBox.scrollByPixels(px,px);
+    tabScrollBox.scrollByPixels(px,3*px);
 }
-//===============================================================
+//== WindowsManager initialization ============================================
 
+WindowsManager.init();
+Services.wm.addListener(WindowsManager.events.windowListener);
 
+//== Extension unload handling ================================================
 
+// https://developer.mozilla.org/en-US/docs/Extensions/Common_causes_of_memory_leaks_in_extensions
+exports.onUnload = function (reason) {
+    Services.wm.removeListener(WindowsManager.events.windowListener);
+    WindowsManager.uninit();
+};
 
 

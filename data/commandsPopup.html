@@ -6,12 +6,20 @@
   <body tabindex="-1">
     <input type="text" id="edit-box" tabindex="1">
     <div id="progress-container"> 
+        <label id="progress-cmd"></label>
         <progress value="0" id="progress-bar"></progress>
         <label id="progress-info"></label>
     </div>
     <div id="msgInfo-container"></div>
     <div id="data-container"></div>
     <hr>
-    <div id="history-container" tabindex="3"></div>
+    <div id="history-container" tabindex="3">
+        <label>
+            History: 
+            <div class='histCmdOK histCmd infoBar'></div> - OK,
+            <div class='histCmdERR histCmd infoBar'></div> - Error,
+            <div class='histCmdPartialOK histCmd infoBar'></div> - partial OK
+        </label>
+    </div>
   </body>
 </html>
