@@ -1,7 +1,7 @@
 {
   "title": "BrowserPuppeteer",
   "name": "browser-puppeteer",
-  "version": "0.1.1a",
+  "version": "0.1.1-alpha",
   "description": "Complete text command-based extention to control browser.Allows user to quickly jump from tab-to-tab within numbers. Provide tab numbering functionality",
   "main": "index.js",
   "author": "sin3t",
