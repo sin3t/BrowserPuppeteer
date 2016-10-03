@@ -29,6 +29,9 @@ Complete text command-based extension to control browser. It provides tab number
   |:--------------------------------:|:----------------------------------------------------:|
   ![Close windows command with progress displayed][commandspopup progress screenshot] | ![List groups command][commandspopup output screenshot]
 
+***
+## Installation
+Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO.
 
 ***
 ## Commands structure
@@ -87,6 +90,8 @@ Types:
 
 Multiple targets are supported, and can be specified in explicit and implicit ways.
  - Explicitly: 
+    - direct item modifier;
+        * 15;
 	- comma separated values - "several value";
 		* 1, 2, 3, 4, 5;
 	- range specific values with reverse range support  - "range";
@@ -158,7 +163,7 @@ Examples:
  - `x22-35,w1,g5` - close tabs from 22 to 35, also close window 1 and group 5;
  - `r"github.com"` - reload all tabs, with github.com site;
  - `x"youtube.com"` - close all tabs with opened youtube.com site;
- - `x22,34,45-60!51` - close tabs 22,23, from 45 to 60, except 51;
+ - `x22,34,45-60!51` - close tabs 22,34, from 45 to 60, except 51;
  - `x-e!"youtube.com"` - close all tabs from current to the end, except tabs with opened youtube.com;
  - `b1-e/toRead/genetics/` - bookmark tabs from first to last into folder tree "toRead"->"genetics";
  - `x""5,""2,<cooking>!23-40` - close all tabs with hosts, opened in tab 5 and in tab 2, also close tabs with word "cooking" in title, but exclude from closing tabs from 23 to 40;
@@ -171,5 +176,7 @@ Examples:
 [horizontal tabs screenshot]:/../screenshots/horizontal_tabs_numbered.png?raw=true "Numbering for horizontal tabs"
 [state buttons screenshot]:/../screenshots/state_buttons.png?raw=true "Current window/group buttons with identificators"
 [tabgroups link]:https://addons.mozilla.org/uk/firefox/addon/tab-groups-panorama/
+[latest version link]:https://github.com/sin3t/BrowserPuppeteer/releases/download/0.1.1-alpha/browserpuppeteer-0.1.1-alpha-fx.xpi
 [commandspopup progress screenshot]:/../screenshots/cmd_progress_demo.png?raw=true "CommandsPopup with 'x10-e' - [Close tabs from 10 to the End] command output"
 [commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with 'lg' - [List Groups] command output"
+
