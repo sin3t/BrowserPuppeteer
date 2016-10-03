@@ -29,11 +29,9 @@ Complete text command-based extension to control browser. It provides tab number
   |:--------------------------------:|:----------------------------------------------------:|
   ![Close windows command with progress displayed][commandspopup progress screenshot] | ![List groups command][commandspopup output screenshot]
 
-***
 ## Installation
 Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO.
 
-***
 ## Commands structure
 Each command consists of several sections : action to do, target to act with, action specific flags and additional (global) flags. Number of sections is variable and depends on action type.
 
