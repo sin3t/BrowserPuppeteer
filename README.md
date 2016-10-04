@@ -30,7 +30,12 @@ Complete text command-based extension to control browser. It provides tab number
   ![Close windows command with progress displayed][commandspopup progress screenshot] | ![List groups command][commandspopup output screenshot]
 
 ## Installation
-Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO.
+Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
+
+ - [TabGroups][tabgroups link] - Tab Groups, formerly known as Panorama or TabView, allows you to manage and organize a large number of open tabs;
+ - [TreeStyleTab][treestyletab link] - show tabs like a tree;
+ - [Vimfx][vimfx link] - short, Vim-style keyboard shortcuts for browsing and navigation, for a near mouseless experience.
+
 
 ## Commands structure
 Each command consists of several sections : action to do, target to act with, action specific flags and additional (global) flags. Number of sections is variable and depends on action type.
@@ -54,14 +59,14 @@ Each command consists of several sections : action to do, target to act with, ac
 ### Actions
 
  - [Switch to (default)](/docs/COMMANDS.md#switch-to-default)
- - [List items](/docs/COMMANDS.md#list-items)
- - [Create item](/docs/COMMANDS.md#create)
- - [Stop tab loading](/docs/COMMANDS.md#stop-loading)
- - [Reload tab](/docs/COMMANDS.md#reload)
- - [Pin/unpin tab](/docs/COMMANDS.md#pinunpin)
- - [Close item](/docs/COMMANDS.md#close)
- - [Bookmark tab](/docs/COMMANDS.md#bookmark)
- - [Move tab](/docs/COMMANDS.md#move)
+ - [l ⇒ List items](/docs/COMMANDS.md#list-items)
+ - [c ⇒ Create item](/docs/COMMANDS.md#create)
+ - [s ⇒ Stop tab loading](/docs/COMMANDS.md#stop-loading)
+ - [r ⇒ Reload tab](/docs/COMMANDS.md#reload)
+ - [p ⇒ Pin/unpin tab](/docs/COMMANDS.md#pinunpin)
+ - [x ⇒ Close item](/docs/COMMANDS.md#close)
+ - [b ⇒ Bookmark tab](/docs/COMMANDS.md#bookmark)
+ - [m ⇒ Move tab](/docs/COMMANDS.md#move)
  
 
 ### Targets
@@ -174,6 +179,8 @@ Examples:
 [horizontal tabs screenshot]:/../screenshots/horizontal_tabs_numbered.png?raw=true "Numbering for horizontal tabs"
 [state buttons screenshot]:/../screenshots/state_buttons.png?raw=true "Current window/group buttons with identificators"
 [tabgroups link]:https://addons.mozilla.org/uk/firefox/addon/tab-groups-panorama/
+[vimfx link]:https://addons.mozilla.org/uk/firefox/addon/vimfx/
+[treestyletab link]:https://addons.mozilla.org/uk/firefox/addon/tree-style-tab/
 [latest version link]:https://github.com/sin3t/BrowserPuppeteer/releases/download/0.1.1-alpha/browserpuppeteer-0.1.1-alpha-fx.xpi
 [commandspopup progress screenshot]:/../screenshots/cmd_progress_demo.png?raw=true "CommandsPopup with 'x10-e' - [Close tabs from 10 to the End] command output"
 [commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with 'lg' - [List Groups] command output"
