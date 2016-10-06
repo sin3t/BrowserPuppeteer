@@ -59,18 +59,19 @@ body {
 #history-container { 
     max-height: 150px; 
 }
-li, 
-.histCmd {
+#history-container li, 
+#history-container .histCmd {
     display: inline-block;
     margin: 3px;
     border: 1px solid;
     border-radius: 3px;
     padding: 4px;
+    font-size: 10px;
 }
-li:hover { 
+#history-container li:hover { 
     background: #99badd 
 }
-ul {
+#history-container ul {
     padding: 10px;
     margin: 2px;
 }
