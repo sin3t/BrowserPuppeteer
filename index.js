@@ -541,7 +541,7 @@ this.TabsManager = {
         for (let groupItem of this.groupItems){
             dataArray.push({groupId : T_GROUP + groupItem.id,
                     countOfTabs : groupItem.children.length,
-                    title       : groupItem.defaultName,//});
+                    title       : groupItem.getTitle(true),
                     thumbnail   : groupItem.canvas.toDataURL()});
         }
         return {headers, dataArray};
