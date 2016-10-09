@@ -352,7 +352,7 @@ Examples:
 |    | b4 - Move BEFORE specific position.                 |
 | s3 +-----------------------------------------------------+
 |    | g4 - Move at specific GROUP.                        |
-|    |-----------------------------------------------------|
+|    +-----------------------------------------------------+
 |    | w4 - Move at specific WINDOW, tab will be moved     |
 |    |      without statate change (form data, state of the|
 |    |      window player won't be interrupted).           |
