@@ -1,12 +1,42 @@
 <style type='text/css'>
-table {
+body {
+    margin: 0px;
+    font-family: 'PT Sans';
     font-size: 12px;
+}
+table {
+    font-size: 11px !important;
+    border-collapse: collapse;
+    margin: 10px;
+    margin-bottom: 15px;
+}
+dd {
+    margin-inline-start: 20px;
+}
+u {
+    white-space:pre;
+}
+h3 {
+    padding-top:15px;
+}
+tr:nth-child(2),
+tr:nth-child(3),
+tr:nth-child(4),
+tr:nth-child(5),
+td[rowspan]:nth-child(1), /* Optimize me */
+td:nth-child(1):not([rowspan]):not([colspan]){
+    text-align: center;
+    vertical-align: middle;
+}
+tr:nth-child(4){ /* Optimize me */
+    white-space: nowrap;
 }
 div {
     display: none;
 }
 label {
     vertical-align:middle;
+    cursor: pointer;
 }
 ul{
     padding: 0px;
@@ -19,29 +49,33 @@ input:checked ~ div{
     display: block;
 }
 input[type=checkbox] {
-    display:none;
+    display: inline-block;
+    visibility: hidden;
+    margin-left: -16px;
+    vertical-align: middle;
 }
  
 input[type=checkbox] + label{
     background: url("list-checkbox-icons.png") no-repeat;
-    background-position: 0px -16px;
+    background-position: 0px -14px;
     height: 16px;
     width: 16px;
     display:inline-block;
 }
 input[type=checkbox]:checked + label{
     background: url("list-checkbox-icons.png") no-repeat; 
-    background-position: -16px -16px;
+    background-position: -16px -14px;
     height: 16px;
     width: 16px;
     display:inline-block;
 }
 </style>
+<h3> Actions list </h3>
 <ul>
 <li>
-<input type=checkbox id=item-0>
+<input type=checkbox id=item-0 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-0></label>
-<label for=item-0 class=data>  Switch to specific item            </label>
+<label for=item-0 class=data accesskey=" ">  <u> </u> - switch to specific item          </label>
 <div>
 
 <table border="1" class="docutils">
@@ -56,7 +90,10 @@ input[type=checkbox]:checked + label{
 </colgroup>
 <tbody valign="top">
 <tr><td>s1</td>
-<td colspan="6">Switch to specific item</td>
+<td colspan="6"><ul class="first last simple">
+<li>switch to specific item</li>
+</ul>
+</td>
 </tr>
 <tr><td rowspan="4">s2</td>
 <td colspan="2">Target</td>
@@ -105,9 +142,9 @@ search</td>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-1>
+<input type=checkbox id=item-1 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-1></label>
-<label for=item-1 class=data>  l - list items                     </label>
+<label for=item-1 class=data accesskey="l">  <u>l</u> - list items                       </label>
 <div>
 
 <table border="1" class="docutils">
@@ -124,7 +161,7 @@ search</td>
 <tr><td>s1</td>
 <td colspan="6">l - list items</td>
 </tr>
-<tr><td>&nbsp;</td>
+<tr><td rowspan="4">s2</td>
 <td colspan="2">Target</td>
 <td>Several
 values</td>
@@ -134,8 +171,7 @@ search</td>
 <td>Title
 search</td>
 </tr>
-<tr><td rowspan="3">s2</td>
-<td>Tab modifier</td>
+<tr><td>Tab modifier</td>
 <td>✘</td>
 <td>✘</td>
 <td>✘</td>
@@ -175,9 +211,9 @@ format &quot;Index:Count of tabs:Title: Thumbnail&quot;.</dd>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-2>
+<input type=checkbox id=item-2 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-2></label>
-<label for=item-2 class=data>  c - create item                    </label>
+<label for=item-2 class=data accesskey="c">  <u>c</u> - create item                      </label>
 <div>
 
 <table border="1" class="docutils">
@@ -245,9 +281,9 @@ is supported only by tabs (now).</dd>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-3>
+<input type=checkbox id=item-3 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-3></label>
-<label for=item-3 class=data>  s - stop loading of the tab        </label>
+<label for=item-3 class=data accesskey="s">  <u>s</u> - stop loading of the tab          </label>
 <div>
 
 <table border="1" class="docutils">
@@ -310,9 +346,9 @@ search</td>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-4>
+<input type=checkbox id=item-4 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-4></label>
-<label for=item-4 class=data>  r - reload tab                     </label>
+<label for=item-4 class=data accesskey="r">  <u>r</u> - reload tab                       </label>
 <div>
 
 <table border="1" class="docutils">
@@ -375,9 +411,9 @@ search</td>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-5>
+<input type=checkbox id=item-5 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-5></label>
-<label for=item-5 class=data>  p - toggle pinning of the tab      </label>
+<label for=item-5 class=data accesskey="p">  <u>p</u> - toggle pinning of the tab        </label>
 <div>
 
 <table border="1" class="docutils">
@@ -440,9 +476,9 @@ search</td>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-6>
+<input type=checkbox id=item-6 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-6></label>
-<label for=item-6 class=data>  x - close item                     </label>
+<label for=item-6 class=data accesskey="x">  <u>x</u> - close item                       </label>
 <div>
 
 <table border="1" class="docutils">
@@ -510,9 +546,9 @@ group 1 and groups from 3 to 5.</dd>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-7>
+<input type=checkbox id=item-7 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-7></label>
-<label for=item-7 class=data>  b - bookmark tab                   </label>
+<label for=item-7 class=data accesskey="b">  <u>b</u> - bookmark tab                     </label>
 <div>
 
 <table border="1" class="docutils">
@@ -588,9 +624,9 @@ into folder tree &quot;work&quot;-&gt;&quot;data for report&quot;.</dd>
 </div>
 </li>
 <li>
-<input type=checkbox id=item-8>
+<input type=checkbox id=item-8 oninput="!this.checked || this.scrollIntoView()">
 <label for=item-8></label>
-<label for=item-8 class=data>  m - move tab                       </label>
+<label for=item-8 class=data accesskey="m">  <u>m</u> - move tab                         </label>
 <div>
 
 <table border="1" class="docutils">
