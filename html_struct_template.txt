@@ -1,0 +1,2 @@
+%(docinfo)s
+%(body)s
