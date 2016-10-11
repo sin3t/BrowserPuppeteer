@@ -25,7 +25,7 @@ let msgInfoContainer = document.getElementById("msgInfo-container");
 
 let helpInjection = document.createElement("object");
 helpInjection.data = "generated-docs.html";
-helpInjection.height = "280";
+helpInjection.height = "275";
 
 //== CommandsPopup functions ===================================================
 var showHelp = function (){

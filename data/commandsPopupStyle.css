@@ -31,7 +31,7 @@ body {
 #commands-container button {
     float: right;
     padding: 0px;
-    font-size: 10px;
+    font-size: 0.7em;
     width: 60px;
     cursor: pointer;
 }
@@ -41,7 +41,7 @@ body {
 }
 #data-container td {
     padding: 5px;
-    font-size: 13px;
+    font-size: 0.8em;
     text-align: center;
     word-wrap: break-word;
     white-space: normal;
@@ -49,13 +49,13 @@ body {
 #data-container tr { 
     border-bottom: 1px solid #ccc; 
 }
-#data-container tr:hover { 
-    background-color: red; 
+#data-container tr:hover {
+    background-color: #b3b3b3; 
 }
-#data-container td:hover:nth-child(1) { 
-    background-color: red; 
+#data-container tr:hover > th {
+    background-color: #dedede;
 }
-#data-container td:nth-child(1) { 
+#data-container tr:not(:hover) > td:nth-child(1) { 
     background-color: #c0c6c0; 
 }
 #data-container td:nth-child(2) {
@@ -72,6 +72,7 @@ body {
 #data-container img {
     width: 80px;
     height: auto;
+    box-shadow: 1px 1px 3px 1px grey;
 }
 #data-container {
     max-height: 280px; 
@@ -87,7 +88,7 @@ body {
     border: 1px solid;
     border-radius: 3px;
     padding: 4px;
-    font-size: 10px;
+    font-size: 0.9em;
 }
 #history-container li:hover { 
     background: #99badd 
@@ -97,7 +98,7 @@ body {
     margin: 2px;
 }
 label { 
-    font-size:10px; 
+    font-size:0.75em; 
 }
 .infoBar {
     width: 4px;
