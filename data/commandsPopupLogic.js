@@ -1,6 +1,3 @@
-// When the user hits return, send the "text-entered"
-// message to main.js.
-// The message payload is the contents of the edit box.
 const 
     EXEC_OK = "OK",
     EXEC_ERROR = "ERR",
@@ -26,6 +23,38 @@ let dataContainer = document.getElementById("data-container");
 let histContainer = document.getElementById("history-container");
 let msgInfoContainer = document.getElementById("msgInfo-container");
 
+let helpInjection = document.createElement("object");
+helpInjection.data = "generated-docs.html";
+helpInjection.height = "280";
+
+//== CommandsPopup functions ===================================================
+var showHelp = function (){
+    removeChilds(dataContainer);
+    dataContainer.appendChild(helpInjection);
+
+    textInput.focus(); // Temp fix of periodical focus loose
+    setTimeout(()=> fixPopupSize(), WAIT_RESIZE_TIMEOUT);
+}
+
+var removeChilds = function (node) {
+    var last;
+    while (last = node.lastChild) node.removeChild(last);
+};
+
+function fixPopupSize(){
+    self.port.emit('resize',{width: document.documentElement.clientWidth, 
+                    height: document.documentElement.clientHeight});
+}
+
+//== OnFirstRun callings =======================================================
+showHelp();
+
+//==============================================================================
+let helpButton = document.getElementById("help-button");
+helpButton.onclick = showHelp;
+
+
+//== EventListeners ============================================================
 textInput.addEventListener('keyup', function onkeyup(event) {
     if (event.keyCode == KEY_ENTER && textInput.value.length > 0) {
         text = textInput.value.replace(/(\r\n|\n|\r)/gm,"");
@@ -34,10 +63,6 @@ textInput.addEventListener('keyup', function onkeyup(event) {
     }
 }, false);
 
-var removeChilds = function (node) {
-    var last;
-    while (last = node.lastChild) node.removeChild(last);
-};
 
 textInput.addEventListener('keyup', function keyPress(event){
     if (event.keyCode == KEY_UP){
@@ -61,12 +86,7 @@ addEventListener('keyup', function keyPress(event){
     }
 }, false);
 
-
-function fixPopupSize(){
-	self.port.emit('resize',{width: document.documentElement.clientWidth, 
-					height: document.documentElement.clientHeight});
-}
-
+//== PortOn singal handlings ==================================================
 self.port.on("show", function onShow() {
     textInput.focus();
 });
@@ -110,16 +130,15 @@ self.port.on("requestData-arrived", function onReqDataArrive(info){
     }
     dataContainer.appendChild(table);
     dataContainer.setAttribute('tabindex','2');
-	setTimeout(()=> fixPopupSize(), WAIT_RESIZE_TIMEOUT);
+    setTimeout(()=> fixPopupSize(), WAIT_RESIZE_TIMEOUT);
 });
 
 self.port.on("task-completed", function onTaskCompleted(){
     self.port.emit("can-be-hiden");
     removeChilds(dataContainer);
-    // removeChilds(histContainer);
     textInput.value = '';
     dataContainer.setAttribute('tabindex','-1');
-	fixPopupSize();
+    fixPopupSize();
 });
 
 self.port.on("historyData-arrived", function onHistDataArrive(data){
@@ -159,17 +178,17 @@ self.port.on("historyData-arrived", function onHistDataArrive(data){
     }
     histContainer.appendChild(list);
 
-	fixPopupSize();
-	textInput.focus(); // Temp fix of periodical focus loose
+    fixPopupSize();
+    textInput.focus(); // Temp fix of periodical focus loose
 });
 
 self.port.on("progressChange", function onProgressChanged(value, length, cmd){
     if (length > 1){
         if (progressContainer.style.display !== 'table'){
             progressContainer.style.display = 'table';
-			progressCmd.textContent = "Exectuting command: " + cmd;
-			fixPopupSize();
-		}
+            progressCmd.textContent = "Exectuting command: " + cmd;
+            fixPopupSize();
+        }
         value += 1;
         progressLabel.textContent = value + " of " + length;
         progressBar.max = length;
@@ -177,8 +196,8 @@ self.port.on("progressChange", function onProgressChanged(value, length, cmd){
     }
     if (value === length){
         progressContainer.style.display = 'none';
-		fixPopupSize();
-	}
+        fixPopupSize();
+    }
     self.port.emit("progressChanged");
 });
 
