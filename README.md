@@ -1,4 +1,4 @@
-# BrowserPuppeteer v0.1.1-alpha - Firefox extension 
+# BrowserPuppeteer v0.1.2-alpha - Firefox extension 
 Complete text command-based extension to control browser. It provides tab numbering functionality, allows user to quickly jump from tab-to-tab within numbers. 
 
 ## Features
@@ -41,7 +41,7 @@ Complete text command-based extension to control browser. It provides tab number
 
 
 ## Installation
-Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
+Signed restartless alpha version is available in releases section ([old version 0.1.1-alpha direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
 
  - [TabGroups][tabgroups link] - Tab Groups, formerly known as Panorama or TabView, allows you to manage and organize a large number of open tabs;
  - [TreeStyleTab][treestyletab link] - show tabs like a tree;
