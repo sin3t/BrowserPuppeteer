@@ -31,9 +31,9 @@ Complete text command-based extension to control browser. It provides tab number
 
 4. Full support of mouseless usage.
 
-In addition to previously mentioned hotkeys and commands, CommandsPopup can be controled itself via hotkeys, mostly with special accesskeys, that are invoked with <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>AccessKey</kbd>. All these keys are underlined, no need to memorize.
+ In addition to previously mentioned hotkeys and commands, CommandsPopup can be controled itself via hotkeys, mostly with special accesskeys, that are invoked with <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>AccessKey</kbd>. All these keys are underlined, no need to memorize.
 
-For example, "Help" button has an "h" accesskey, pressing  <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>h</kbd> will show help frame with ability to navigate through commands help with other accesskeys. Below you can see screenshot of called <kbd>x</kbd> to view more info about close command. Note, that content is automatically scrolled on opening, so there is no need to make useless movements to basic part.
+ For example, "Help" button has an "h" accesskey, pressing  <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>h</kbd> will show help frame with ability to navigate through commands help with other accesskeys. Below you can see screenshot of called <kbd>x</kbd> to view more info about close command. Note, that content is automatically scrolled on opening, so there is no need to make useless movements to basic part.
 
   | CommandsPopup with accesskey "h" called | CommandsPopup with accesskey "x" called |
   |:---------------------------------------:|:---------------------------------------:|
