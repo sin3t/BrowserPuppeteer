@@ -29,6 +29,17 @@ Complete text command-based extension to control browser. It provides tab number
   |:--------------------------------:|:----------------------------------------------------:|
   ![Close windows command with progress displayed][commandspopup progress screenshot] | ![List groups command][commandspopup output screenshot]
 
+4. Full support of mouseless usage.
+
+In addition to previously mentioned hotkeys and commands, CommandsPopup can be controled itself via hotkeys, mostly with special accesskeys, that are invoked with <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>AccessKey</kbd>. All these keys are underlined, no need to memorize.
+
+For example, "Help" button has an "h" accesskey, pressing  <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>h</kbd> will show help frame with ability to navigate through commands help with other accesskeys. Below you can see screenshot of called <kbd>x</kbd> to view more info about close command. Note, that content is automatically scrolled on opening, so there is no need to make useless movements to basic part.
+
+  | CommandsPopup with accesskey "h" called | CommandsPopup with accesskey "x" called |
+  |:---------------------------------------:|:---------------------------------------:|
+  ![CommandsPopup with help frame][commandspopup helpframe screenshot] | ![CommandsPopup with close command info in help frame][commandspopup close command help screenshot]
+
+
 ## Installation
 Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
 
@@ -183,5 +194,6 @@ Examples:
 [treestyletab link]:https://addons.mozilla.org/uk/firefox/addon/tree-style-tab/
 [latest version link]:https://github.com/sin3t/BrowserPuppeteer/releases/download/0.1.1-alpha/browserpuppeteer-0.1.1-alpha-fx.xpi
 [commandspopup progress screenshot]:/../screenshots/cmd_progress_demo.png?raw=true "CommandsPopup with 'x10-e' - [Close tabs from 10 to the End] command output"
-[commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with 'lg' - [List Groups] command output"
-
+[commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with - [List Groups] command output"
+[commandspopup helpframe screenshot]:/../screenshots/help_output.png?raw=true "CommandsPopup with help frame"
+[commandspopup close command help screenshot]:/../screenshots/help_output_cmd_x.png?raw=true "CommandsPopup info about close command in help frame"
