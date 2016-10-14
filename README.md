@@ -41,7 +41,7 @@ Complete text command-based extension to control browser. It provides tab number
 
 
 ## Installation
-Signed restartless alpha version is available in releases section ([old version 0.1.1-alpha direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
+Signed restartless alpha version is available in releases section ([direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
 
  - [TabGroups][tabgroups link] - Tab Groups, formerly known as Panorama or TabView, allows you to manage and organize a large number of open tabs;
  - [TreeStyleTab][treestyletab link] - show tabs like a tree;
@@ -192,8 +192,8 @@ Examples:
 [tabgroups link]:https://addons.mozilla.org/uk/firefox/addon/tab-groups-panorama/
 [vimfx link]:https://addons.mozilla.org/uk/firefox/addon/vimfx/
 [treestyletab link]:https://addons.mozilla.org/uk/firefox/addon/tree-style-tab/
-[latest version link]:https://github.com/sin3t/BrowserPuppeteer/releases/download/0.1.1-alpha/browserpuppeteer-0.1.1-alpha-fx.xpi
+[latest version link]:https://github.com/sin3t/BrowserPuppeteer/releases/download/0.1.2-alpha/browserpuppeteer-0.1.2-alpha1-fx.xpi
 [commandspopup progress screenshot]:/../screenshots/cmd_progress_demo.png?raw=true "CommandsPopup with 'x10-e' - [Close tabs from 10 to the End] command output"
-[commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with - [List Groups] command output"
+[commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with 'lg' - [List Groups] command output"
 [commandspopup helpframe screenshot]:/../screenshots/help_output.png?raw=true "CommandsPopup with help frame"
 [commandspopup close command help screenshot]:/../screenshots/help_output_cmd_x.png?raw=true "CommandsPopup info about close command in help frame"
