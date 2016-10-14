@@ -4,7 +4,13 @@
     <link href="commandsPopupStyle.css" rel="stylesheet" type="text/css">
   </head>
   <body tabindex="-1">
-    <input type="text" id="edit-box" tabindex="1">
+    <div id="commands-container">
+        <input type="text" id="edit-box" tabindex="1">
+        <button id="help-button" accesskey="h" tabindex="-1">
+            <img src="help-icon.png">
+            <span>Help</span>
+        </button>
+    </div>
     <div id="progress-container"> 
         <label id="progress-cmd"></label>
         <progress value="0" id="progress-bar"></progress>

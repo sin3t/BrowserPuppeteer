@@ -1,26 +1,49 @@
-input { 
-    width: 100%; 
-}
 body {
     overflow: hidden;
     display: inline-block;
     margin: 5px;
-    padding 10px;
     background-color: #dedede;
     width: 300px;
     max-width: 300px;
     max-height: 470px;
     padding-left: 5px;
+    padding-right: 5px;
     padding-bottom: 10px;
 }
 
+#commands-container {
+    display: flex;
+    margin-bottom: 5px;
+    vertical-align: middle;
+}
+#commands-container input { 
+    float: left;
+    padding: 0px;
+    width: 80%;
+}
+#commands-container button > * {
+    display:inline-block;
+    vertical-align: middle;
+}
+#commands-container button span:first-letter {
+    text-decoration: underline;
+}
+#commands-container button {
+    float: right;
+    padding: 0px;
+    font-size: 0.7em;
+    width: 60px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
 #data-container table {
     width: 100%;
     border-collapse: collapse;
 }
 #data-container td {
     padding: 5px;
-    font-size: 13px;
+    font-size: 0.8em;
     text-align: center;
     word-wrap: break-word;
     white-space: normal;
@@ -28,13 +51,13 @@ body {
 #data-container tr { 
     border-bottom: 1px solid #ccc; 
 }
-#data-container tr:hover { 
-    background-color: red; 
+#data-container tr:hover {
+    background-color: #b3b3b3; 
 }
-#data-container td:hover:nth-child(1) { 
-    background-color: red; 
+#data-container tr:hover > th {
+    background-color: #dedede;
 }
-#data-container td:nth-child(1) { 
+#data-container tr:not(:hover) > td:nth-child(1) { 
     background-color: #c0c6c0; 
 }
 #data-container td:nth-child(2) {
@@ -51,31 +74,33 @@ body {
 #data-container img {
     width: 80px;
     height: auto;
+    box-shadow: 1px 1px 3px 1px grey;
 }
-#data-container { 
+#data-container {
     max-height: 280px; 
 }
 
 #history-container { 
     max-height: 150px; 
 }
-li, 
-.histCmd {
+#history-container li, 
+#history-container .histCmd {
     display: inline-block;
     margin: 3px;
     border: 1px solid;
     border-radius: 3px;
     padding: 4px;
+    font-size: 0.9em;
 }
-li:hover { 
+#history-container li:hover { 
     background: #99badd 
 }
-ul {
+#history-container ul {
     padding: 10px;
     margin: 2px;
 }
 label { 
-    font-size:10px; 
+    font-size:0.75em; 
 }
 .infoBar {
     width: 4px;
@@ -119,3 +144,4 @@ label {
 #progress-cmd {
     display: table-row;
 }
+

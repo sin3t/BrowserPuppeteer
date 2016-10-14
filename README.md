@@ -1,4 +1,4 @@
-# BrowserPuppeteer v0.1.1-alpha - Firefox extension 
+# BrowserPuppeteer v0.1.2-alpha - Firefox extension 
 Complete text command-based extension to control browser. It provides tab numbering functionality, allows user to quickly jump from tab-to-tab within numbers. 
 
 ## Features
@@ -29,8 +29,25 @@ Complete text command-based extension to control browser. It provides tab number
   |:--------------------------------:|:----------------------------------------------------:|
   ![Close windows command with progress displayed][commandspopup progress screenshot] | ![List groups command][commandspopup output screenshot]
 
+4. Full support of mouseless usage.
 
-***
+ In addition to previously mentioned hotkeys and commands, CommandsPopup can be controled itself via hotkeys, mostly with special accesskeys, that are invoked with <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>AccessKey</kbd>. All these keys are underlined, no need to memorize.
+
+ For example, "Help" button has an "h" accesskey, pressing  <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>h</kbd> will show help frame with ability to navigate through commands help with other accesskeys. Below you can see screenshot of called <kbd>x</kbd> to view more info about close command. Note, that content is automatically scrolled on opening, so there is no need to make useless movements to basic part.
+
+  | CommandsPopup with accesskey "h" called | CommandsPopup with accesskey "x" called |
+  |:---------------------------------------:|:---------------------------------------:|
+  ![CommandsPopup with help frame][commandspopup helpframe screenshot] | ![CommandsPopup with close command info in help frame][commandspopup close command help screenshot]
+
+
+## Installation
+Signed restartless alpha version is available in releases section ([old version 0.1.1-alpha direct download link][latest version link]). Beta version will be listed in AMO. To improve productivity the next extensions are recommended to install:
+
+ - [TabGroups][tabgroups link] - Tab Groups, formerly known as Panorama or TabView, allows you to manage and organize a large number of open tabs;
+ - [TreeStyleTab][treestyletab link] - show tabs like a tree;
+ - [Vimfx][vimfx link] - short, Vim-style keyboard shortcuts for browsing and navigation, for a near mouseless experience.
+
+
 ## Commands structure
 Each command consists of several sections : action to do, target to act with, action specific flags and additional (global) flags. Number of sections is variable and depends on action type.
 
@@ -53,14 +70,14 @@ Each command consists of several sections : action to do, target to act with, ac
 ### Actions
 
  - [Switch to (default)](/docs/COMMANDS.md#switch-to-default)
- - [List items](/docs/COMMANDS.md#list-items)
- - [Create item](/docs/COMMANDS.md#create)
- - [Stop tab loading](/docs/COMMANDS.md#stop-loading)
- - [Reload tab](/docs/COMMANDS.md#reload)
- - [Pin/unpin tab](/docs/COMMANDS.md#pinunpin)
- - [Close item](/docs/COMMANDS.md#close)
- - [Bookmark tab](/docs/COMMANDS.md#bookmark)
- - [Move tab](/docs/COMMANDS.md#move)
+ - [l ⇒ List items](/docs/COMMANDS.md#list-items)
+ - [c ⇒ Create item](/docs/COMMANDS.md#create)
+ - [s ⇒ Stop tab loading](/docs/COMMANDS.md#stop-loading)
+ - [r ⇒ Reload tab](/docs/COMMANDS.md#reload)
+ - [p ⇒ Pin/unpin tab](/docs/COMMANDS.md#pinunpin)
+ - [x ⇒ Close item](/docs/COMMANDS.md#close)
+ - [b ⇒ Bookmark tab](/docs/COMMANDS.md#bookmark)
+ - [m ⇒ Move tab](/docs/COMMANDS.md#move)
  
 
 ### Targets
@@ -87,6 +104,8 @@ Types:
 
 Multiple targets are supported, and can be specified in explicit and implicit ways.
  - Explicitly: 
+    - direct item modifier;
+        * 15;
 	- comma separated values - "several value";
 		* 1, 2, 3, 4, 5;
 	- range specific values with reverse range support  - "range";
@@ -158,7 +177,7 @@ Examples:
  - `x22-35,w1,g5` - close tabs from 22 to 35, also close window 1 and group 5;
  - `r"github.com"` - reload all tabs, with github.com site;
  - `x"youtube.com"` - close all tabs with opened youtube.com site;
- - `x22,34,45-60!51` - close tabs 22,23, from 45 to 60, except 51;
+ - `x22,34,45-60!51` - close tabs 22,34, from 45 to 60, except 51;
  - `x-e!"youtube.com"` - close all tabs from current to the end, except tabs with opened youtube.com;
  - `b1-e/toRead/genetics/` - bookmark tabs from first to last into folder tree "toRead"->"genetics";
  - `x""5,""2,<cooking>!23-40` - close all tabs with hosts, opened in tab 5 and in tab 2, also close tabs with word "cooking" in title, but exclude from closing tabs from 23 to 40;
@@ -171,5 +190,10 @@ Examples:
 [horizontal tabs screenshot]:/../screenshots/horizontal_tabs_numbered.png?raw=true "Numbering for horizontal tabs"
 [state buttons screenshot]:/../screenshots/state_buttons.png?raw=true "Current window/group buttons with identificators"
 [tabgroups link]:https://addons.mozilla.org/uk/firefox/addon/tab-groups-panorama/
+[vimfx link]:https://addons.mozilla.org/uk/firefox/addon/vimfx/
+[treestyletab link]:https://addons.mozilla.org/uk/firefox/addon/tree-style-tab/
+[latest version link]:https://github.com/sin3t/BrowserPuppeteer/releases/download/0.1.1-alpha/browserpuppeteer-0.1.1-alpha-fx.xpi
 [commandspopup progress screenshot]:/../screenshots/cmd_progress_demo.png?raw=true "CommandsPopup with 'x10-e' - [Close tabs from 10 to the End] command output"
-[commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with 'lg' - [List Groups] command output"
+[commandspopup output screenshot]:/../screenshots/cmd_lg_output.png?raw=true "CommandsPopup with - [List Groups] command output"
+[commandspopup helpframe screenshot]:/../screenshots/help_output.png?raw=true "CommandsPopup with help frame"
+[commandspopup close command help screenshot]:/../screenshots/help_output_cmd_x.png?raw=true "CommandsPopup info about close command in help frame"

@@ -1,0 +1,714 @@
+<style type='text/css'>
+body {
+    margin: 0px;
+    font-family: 'PT Sans';
+    font-size: 12px;
+}
+table {
+    font-size: 11px !important;
+    border-collapse: collapse;
+    margin: 10px;
+    margin-bottom: 15px;
+}
+dd {
+    margin-inline-start: 20px;
+}
+u {
+    white-space:pre;
+}
+h3 {
+    padding-top:15px;
+}
+tr:nth-child(2),
+tr:nth-child(3),
+tr:nth-child(4),
+tr:nth-child(5),
+td[rowspan]:nth-child(1), /* Optimize me */
+td:nth-child(1):not([rowspan]):not([colspan]){
+    text-align: center;
+    vertical-align: middle;
+}
+tr:nth-child(4){ /* Optimize me */
+    white-space: nowrap;
+}
+div {
+    display: none;
+}
+label {
+    vertical-align:middle;
+    cursor: pointer;
+}
+ul{
+    padding: 0px;
+    list-style: none;
+}
+li {
+    border: 1px solid #D4D4D4;
+}
+input:checked ~ div{
+    display: block;
+}
+input[type=checkbox] {
+    display: inline-block;
+    visibility: hidden;
+    margin-left: -16px;
+    vertical-align: middle;
+}
+ 
+input[type=checkbox] + label{
+    background: url("list-checkbox-icons.png") no-repeat;
+    background-position: 0px -14px;
+    height: 16px;
+    width: 16px;
+    display:inline-block;
+}
+input[type=checkbox]:checked + label{
+    background: url("list-checkbox-icons.png") no-repeat; 
+    background-position: -16px -14px;
+    height: 16px;
+    width: 16px;
+    display:inline-block;
+}
+</style>
+<h3> Actions list </h3>
+<ul>
+<li>
+<input type=checkbox id=item-0 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-0></label>
+<label for=item-0 class=data accesskey=" ">  <u> </u> - switch to specific item          </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6"><ul class="first last simple">
+<li>switch to specific item</li>
+</ul>
+</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>25</dt>
+<dd>Go to the tab with number 25.</dd>
+<dt>w3</dt>
+<dd>Go to the window 3.</dd>
+<dt>g5</dt>
+<dd>Go to the group 5.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-1 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-1></label>
+<label for=item-1 class=data accesskey="l">  <u>l</u> - list items                       </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">l - list items</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Not supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>lw</dt>
+<dd>Load and show list of the opened windows in
+format &quot;Index:Count of tabs:Title: Thumbail&quot;.</dd>
+<dt>lg</dt>
+<dd>Load and show list of the opened groups in
+format &quot;Index:Count of tabs:Title: Thumbnail&quot;.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-2 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-2></label>
+<label for=item-2 class=data accesskey="c">  <u>c</u> - create item                      </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">c - create item</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Not supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>c</dt>
+<dd>Create new tab.</dd>
+<dt>c5</dt>
+<dd>Create new tab in specific position. This feature
+is supported only by tabs (now).</dd>
+<dt>cw</dt>
+<dd>Create new window.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-3 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-3></label>
+<label for=item-3 class=data accesskey="s">  <u>s</u> - stop loading of the tab          </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">s - stop loading of the tab</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>s1-60</dt>
+<dd>Stop loading tabs  from 1 to 60.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-4 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-4></label>
+<label for=item-4 class=data accesskey="r">  <u>r</u> - reload tab                       </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">r - reload tab</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>r-e</dt>
+<dd>Force reloading tabs from current to the end.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-5 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-5></label>
+<label for=item-5 class=data accesskey="p">  <u>p</u> - toggle pinning of the tab        </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">p - toggle pinning of the tab</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>p1,3</dt>
+<dd>Toggle pinning of the tabs 1 and 3.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-6 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-6></label>
+<label for=item-6 class=data accesskey="x">  <u>x</u> - close item                       </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">x - close item</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>x</dt>
+<dd>Close current tab.</dd>
+<dt>xw</dt>
+<dd>Close current window.</dd>
+<dt>x1-5,w2-w6,g1,g3-g5</dt>
+<dd>Close tabs from 1 to 5, windows from 2 to 6, and
+group 1 and groups from 3 to 5.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-7 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-7></label>
+<label for=item-7 class=data accesskey="b">  <u>b</u> - bookmark tab                     </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">b - bookmark tab</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>s3</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>/folder/subfolder/                       [optional]</dt>
+<dd>Bookmark at specific folder in tree.
+Default is root folder, and it is &quot;unfilled&quot;.
+If folder not exists, extension will create it.</dd>
+</dl>
+</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>b1-5,&lt;.pdf&gt;,&quot;wikipedia.org&quot;/work/data for report/</dt>
+<dd>Bookmark tabs from 1 to 5, tasb with &quot;.pdf&quot; in
+title, and tabs with opened wikipedia.org domain
+into folder tree &quot;work&quot;-&gt;&quot;data for report&quot;.</dd>
+<dt>b1-e</dt>
+<dd>Bookmark tabs from 1 to the last one into root.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li>
+<input type=checkbox id=item-8 oninput="!this.checked || this.scrollIntoView()">
+<label for=item-8></label>
+<label for=item-8 class=data accesskey="m">  <u>m</u> - move tab                         </label>
+<div>
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="33%" />
+<col width="6%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>s1</td>
+<td colspan="6">m - move tab</td>
+</tr>
+<tr><td rowspan="4">s2</td>
+<td colspan="2">Target</td>
+<td>Several
+values</td>
+<td>Range</td>
+<td>Host
+search</td>
+<td>Title
+search</td>
+</tr>
+<tr><td>Tab modifier</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr><td>Window modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td>Group modifier</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+</tr>
+<tr><td rowspan="5">s3</td>
+<td colspan="6">&#64;4 - Move AT specifc position.</td>
+</tr>
+<tr><td colspan="6">a4 - Move AFTER specific position.</td>
+</tr>
+<tr><td colspan="6">b4 - Move BEFORE specific position.</td>
+</tr>
+<tr><td colspan="6">g4 - Move at specific GROUP.</td>
+</tr>
+<tr><td colspan="6"><dl class="first last docutils">
+<dt>w4 - Move at specific WINDOW, tab will be moved</dt>
+<dd>without statate change (form data, state of the
+window player won't be interrupted).</dd>
+</dl>
+</td>
+</tr>
+<tr><td>sN</td>
+<td colspan="6">Supported</td>
+</tr>
+<tr><td>e.g.</td>
+<td colspan="6"><dl class="first last docutils">
+<dt>m24-50,72,&quot;ex.com&quot;,&lt;word&gt;&#64;5</dt>
+<dd>Move tabs from 24 to 50 and 72, also tabs witg
+opened host &quot;ex.com&quot;, and tabs with word &quot;word&quot;
+in title to the position 5.</dd>
+<dt>m1-ew3!&lt;needed info&gt;</dt>
+<dd>Move tab from 1 to the last to the window 3
+except tabs with word &quot;needed info&quot; in title.</dd>
+<dt>m&#64;e</dt>
+<dd>Move current tab to the end.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+</ul>

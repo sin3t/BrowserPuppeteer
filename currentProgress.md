@@ -14,7 +14,7 @@
 State| Cmd                  |  Description  
 |----|----------------------|-------------------------------------------------------------
 | +  |5                     | goes to the 5 tab
-|    |g1                    | goes to the 1 group
+| +  |g1                    | goes to the 1 group
 |    |g/oldName/->/newName/ | rename group?
 |    |15g1"                 | goest the 1 group, 15 tab in THAT group
 |    | x<some content>      | hiden action, dont show in cmd history
@@ -58,7 +58,7 @@ State| Cmd                  |  Description
 | +  |b""                   | bookmark all tabs, that belongs to the currently opened host
 |    |b/oldDirName/->/newDirName/
 | +  |xg1                   | close all group 1
-|    |xg                    | close current group
+| +  |xg                    | close current group
 |    |X                     | undo last closing  |  can be done with remmembering last position + url pairs
 | +  |x101,102,g1           | close 102,102 and group1
 |    |c10g1                 | create 10 in g1
@@ -139,136 +139,4 @@ State| Cmd                  |  Description
           |- Relative
           |- Sequiental
 
-  Basic algorithm:
-  Event -> Extenstion is loaded
-      then
-          checks 
-              prefs
-              conflicting addons (TabBadge?)
-          get current window 
-          get visible tabs
-          map visible tabs ID to Indexes
-          add labels with specific tab's Indexes
 
-  Event -> Tab closed
-      then
-          change all label AFTER closed tab
-          OR
-          do nothing in case of reservationless numeration
-  Event -> Tab opened
-          If it will be opened
-              last -> just add label
-              somewhere else -> recount elements after added tab in case
-                  of reservationless numeration state
-  Event -> Tab moved
-          recount and relabel indexes after
-          OR
-          do nothing in case of reservational numeration
-  Event -> Group changed
-          recount tabs
-          relabel it
-  Event -> Group closed (valueable in case of global numbering)
-
-  So, the will be the next possible functions:
-          ==Base==
-      getCurrentWindow
-      getCurrentTab
-      countVisibleTabs
-      countAllTabs
-      bindKeys
-          ==Numerical logic==
-      getTabsAfterCurrent
-      mapTabsToIndexes
-      remapTabsToIndexes ?
-          ==GUI opps==
-      addTabLabel
-      updateTabLabel
-      deleteTabLabel
-      showCmdInput
-      readCmdFromInput
-          ==Controlling==
-      getCmd
-      goToGroup
-      goToTab
-      scrollTabBarNext -> for horizontal go RIGHT, for vertical go DOWN
-      scrollTabBarPrev -> for horizontal go LEFT, for vertical go UP
-          ==Event listeners==
-      onTabOpened
-      onTabClosed
-      onTabMoved
-      onGroupChange ? 
-          ==Extension dependent==
-      checkPrefs
-      loadPrefs
-      savePrefs
- Rename TM to TabsManager
- set the next strcture
- TabsManager
-    |-dataProvider
-        |-[g,s]ownerWindow
-        |-[g]gBrowser
-        |-groupsMaps
-        |-[g]groupItems
-        |-[g]currentGroup
-        |-[g]activeIndexToIdMap
-        |-[g]activeIdToIndexMap
-        |-visibleTabs
-        |-commandHistory
-        |-counfOfTabs
-        |-_initData
-        |-doIndexIdRemaping
-        |-removeTabFromMapsAt
-        |-addTabToMaps
-        |-getTabAt
-        |-getTabIndex
-        |-getCurrentTab
-        |-getCurrentTabIndex
-        |-isLastTab
-        |-wasLastTab
-        |-isCurrentTab
-        |-goNextGroup
-        |-trackGroupChange
-        |-updateLabelsData
-        |-doOptimizedUpdateForClose
-        |-doOptimizedUpdateForOpen
-        |-doOptimizedUpdateForMove
-    |-UIchanger
-        |-addLabel
-        |-updateLabel
-        |-removeLabel
-        |-paintTabLabels
-    |-dataParser
-        |-hasPath
-        |-hasPlacing
-        |-hasSeveralValues
-        |-extractHostValues
-        |-extractRangeValues
-        |-getSimplifiedArray
-        |-hasExcludeList
-        |-hasHostData
-        |-isRange
-        |-isNumber
-    |-actions
-        |-fixPinnedTabs
-        |-openTab
-        |-closeTab
-        |-reloadTab
-        |-stopLoadingTab
-        |-moveTab
-        |-getRootURI
-        |-switchToTab
-        |-tooglePinning
-        |-bookmarkTab
-        |-createGroup
-        |-createWindow
-        |-closeGroup
-        |-closeWindow
-        |-changeGroupByName
-        |-changeWindowByName
-        |-scrollTabViewNext
-        |-scrollTabViewPrev
-    |-events
- CommandManager
-    |-popupProvider
-    |-handler
-```
