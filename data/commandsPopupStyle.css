@@ -2,12 +2,12 @@ body {
     overflow: hidden;
     display: inline-block;
     margin: 5px;
-    padding 10px;
     background-color: #dedede;
     width: 300px;
     max-width: 300px;
     max-height: 470px;
     padding-left: 5px;
+    padding-right: 5px;
     padding-bottom: 10px;
 }
 
@@ -34,6 +34,8 @@ body {
     font-size: 0.7em;
     width: 60px;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
 }
 #data-container table {
     width: 100%;
