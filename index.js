@@ -52,7 +52,7 @@ const
     ACTION_RELOAD_T = "r",
     ACTION_LIST_INFO = "l",
     ACTION_STOPLOAD_T = "s",
-    ACTION_TOOGLE_PINNING = "p",
+    ACTION_TOGGLE_PINNING = "p",
     ACTION_TREESTYLETAB_CONTROL = "t",
 
     COMMANDSPOPUP_POSITION = 40,
@@ -801,7 +801,7 @@ this.TabsManager = {
             tabs_utils.activateTab(tab, window);
         },
 
-        tooglePinning : function(tabIndex, aParams){
+        togglePinning : function(tabIndex, aParams){
             let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
             if (!tab.pinned)
                 this.parent.gBrowser.pinTab(tab);
@@ -1066,8 +1066,8 @@ this.TabsManager = {
                 case ACTION_BOOKMARK:
                         doAction.forTab = tabActs.bookmarkTab.bind(tabActs);
                         break;
-                case ACTION_TOOGLE_PINNING:
-                        doAction.forTab = tabActs.tooglePinning.bind(tabActs);
+                case ACTION_TOGGLE_PINNING:
+                        doAction.forTab = tabActs.togglePinning.bind(tabActs);
                         break;
                 case ACTION_MOVE:
                         doAction.forTab = tabActs.moveTab.bind(tabActs);
