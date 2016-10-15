@@ -28,7 +28,7 @@ helpInjection.data = "generated-docs.html";
 helpInjection.height = "275";
 
 //== CommandsPopup functions ===================================================
-var showHelp = function (){
+var showHelp = function () {
     removeChilds(dataContainer);
     dataContainer.appendChild(helpInjection);
 
@@ -41,7 +41,7 @@ var removeChilds = function (node) {
     while (last = node.lastChild) node.removeChild(last);
 };
 
-function fixPopupSize(){
+function fixPopupSize() {
     self.port.emit('resize',{width: document.documentElement.clientWidth, 
                     height: document.documentElement.clientHeight});
 }
@@ -64,11 +64,11 @@ textInput.addEventListener('keyup', function onkeyup(event) {
 }, false);
 
 
-textInput.addEventListener('keyup', function keyPress(event){
-    if (event.keyCode == KEY_UP){
+textInput.addEventListener('keyup', function keyPress(event) {
+    if (event.keyCode == KEY_UP) {
         console.log("Up key was pressed");
     }
-    if (event.keyCode == KEY_DOWN){
+    if (event.keyCode == KEY_DOWN) {
         console.log("Down key was pressed");
         // let list = histContainer.getElementsByTagName("li");
         // textInput.value = list[0].textContent;
@@ -80,7 +80,7 @@ textInput.addEventListener('keyup', function keyPress(event){
     }
 });
 
-addEventListener('keyup', function keyPress(event){
+addEventListener('keyup', function keyPress(event) {
     if (event.keyCode == KEY_TAB){
         console.log("Tab key pressed");
     }
@@ -91,7 +91,7 @@ self.port.on("show", function onShow() {
     textInput.focus();
 });
 
-self.port.on("requestData-arrived", function onReqDataArrive(info){
+self.port.on("requestData-arrived", function onReqDataArrive(info) {
     removeChilds(dataContainer);
 
     // TODO: Make items clickable
@@ -101,7 +101,7 @@ self.port.on("requestData-arrived", function onReqDataArrive(info){
     let table = document.createElement('table');
 
     let headersRow = document.createElement('tr');
-    for (let value of Object.values(headers)){
+    for (let value of Object.values(headers)) {
         let header = document.createElement('th');
         header.textContent = value;
         headersRow.appendChild(header); 
@@ -110,15 +110,15 @@ self.port.on("requestData-arrived", function onReqDataArrive(info){
 
     for (let object of data){
         let row = document.createElement('tr');
-        for (let key of Object.keys(object)){
+        for (let key of Object.keys(object)) {
             let value = object[key];
             let cell = document.createElement('td');
 
-            if (key == "thumbnail"){
+            if (key == "thumbnail") {
                 let img = document.createElement('img');
                 img.setAttribute('src', value);
                 cell.appendChild(img);
-            }else{
+            } else {
                 cell.textContent = value.length > MAX_FIELD_LENGTH
                      ? value.substring(0, MAX_FIELD_LENGTH) + "..." : value;
                 if (key == "title") cell.title = value;
@@ -133,7 +133,7 @@ self.port.on("requestData-arrived", function onReqDataArrive(info){
     setTimeout(()=> fixPopupSize(), WAIT_RESIZE_TIMEOUT);
 });
 
-self.port.on("task-completed", function onTaskCompleted(){
+self.port.on("task-completed", function onTaskCompleted() {
     self.port.emit("can-be-hiden");
     removeChilds(dataContainer);
     textInput.value = '';
@@ -141,10 +141,10 @@ self.port.on("task-completed", function onTaskCompleted(){
     fixPopupSize();
 });
 
-self.port.on("historyData-arrived", function onHistDataArrive(data){
+self.port.on("historyData-arrived", function onHistDataArrive(data) {
 
     let list = document.getElementById("history-list");
-    if (!list){
+    if (!list) {
         list = document.createElement('ul');
         list.id = "history-list";
     }
@@ -155,17 +155,17 @@ self.port.on("historyData-arrived", function onHistDataArrive(data){
     // If actual commands hist is shorter, than displayed,
     // we probaly are in widow with another history, so
     // clear all previous data, and add all new data with help of diff modification
-    if (diff < 0){
+    if (diff < 0) {
         removeChilds(list);
         diff = dataLen;
     }
 
-    for (let i = dataLen - diff; i < dataLen; i++){
+    for (let i = dataLen - diff; i < dataLen; i++) {
         let item = document.createElement('li');
         let cmdResult = data[i];
         item.textContent = cmdResult.command;
         item.title = cmdResult.executionMsg;
-        switch (cmdResult.executionState){
+        switch (cmdResult.executionState) {
             case EXEC_OK        : item.className = "histCmdOK"; break;
             case EXEC_ERROR     : item.className = "histCmdERR"; break;
             case EXEC_PARTIALOK : item.className = "histCmdPartialOK"; break;
@@ -182,7 +182,7 @@ self.port.on("historyData-arrived", function onHistDataArrive(data){
     textInput.focus(); // Temp fix of periodical focus loose
 });
 
-self.port.on("progressChange", function onProgressChanged(value, length, cmd){
+self.port.on("progressChange", function onProgressChanged(value, length, cmd) {
     if (length > 1){
         if (progressContainer.style.display !== 'table'){
             progressContainer.style.display = 'table';
@@ -194,7 +194,7 @@ self.port.on("progressChange", function onProgressChanged(value, length, cmd){
         progressBar.max = length;
         progressBar.value = value;
     }
-    if (value === length){
+    if (value === length) {
         progressContainer.style.display = 'none';
         fixPopupSize();
     }
