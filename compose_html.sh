@@ -6,9 +6,13 @@
 # a3. Switch to main branch (development), and sync documentation versions
 #   OR
 # b2. Copy changes files directrly in main branch -> NOT Recommended
+
 CSS_FILE="implied_style.css"
 HTML_TEMPLATE_FILE="html_struct_template.txt"
 rst2htmlCMD="rst2html2 -v --template=$HTML_TEMPLATE_FILE"
+META_DATA="<meta charset="UTF-8">"
+
+COMMANDS=$(git show develoment:docs/COMMANDS.md)
 
 read -r -d '' STYLE <<- EOP
 	<style type='text/css'>
@@ -16,8 +20,9 @@ read -r -d '' STYLE <<- EOP
 	</style>
 EOP
 
+echo "$META_DATA"
 echo "$STYLE"
-cat ../web/docs/COMMANDS.md \
+echo "$COMMANDS" \
     | sed -n '/^## Actions list$/,/^## /{/^## \|```\|^###/!p;}' \
     | awk -v genhtmlcom="$rst2htmlCMD" \
         'BEGIN \
