@@ -102,7 +102,7 @@ var IOService = Cc["@mozilla.org/network/io-service;1"]
 var windowStateBtn =  buttons.ActionButton({
     id: "window-button",
     label: "Window button",
-    icon: "./window.png",
+    icon: "./images/window.png",
     badge: "",
     badgeColor: TOOLBARBTN_STYLE_BADGECOLOR,
     onClick: function() {
@@ -118,7 +118,7 @@ var windowStateBtn =  buttons.ActionButton({
 var groupStateBtn =  buttons.ActionButton({
     id: "group-button",
     label: "Group button",
-    icon: "./tabgroups.png",
+    icon: "./images/tabgroups.png",
     badge: "",
     badgeColor: TOOLBARBTN_STYLE_BADGECOLOR,
     onClick: function() {
