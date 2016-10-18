@@ -718,7 +718,7 @@ this.TabsManager = {
             this.parent.gBrowser.tabContainer._positionPinnedTabs();
         },
 
-        openTab : function(tabIndex, aParams) {
+        openTabAt : function(tabIndex, aParams) {
             let url = NEWTAB_URL;
             // TODO: Stop TST service, move tab, enable TST service
             if ('TreeStyleTabService' in this.parent.ownerWindow)
@@ -730,17 +730,17 @@ this.TabsManager = {
             this.parent.gBrowser.selectedTab = newTab;
         },
 
-        closeTab : function(tabIndex, aParams) {
+        closeTabAt : function(tabIndex, aParams) {
             let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
             this.parent.gBrowser.removeTab(tab, {animate:false});
         },
 
-        reloadTab : function(tabIndex, aParams) {
+        reloadTabAt : function(tabIndex, aParams) {
             let tab = this.parent.getTabAt(tabIndex);
             this.parent.gBrowser.reloadTab(tab);
         },
 
-        stopLoadingTab : function(tabIndex, aParams) {
+        stopLoadingTabAt : function(tabIndex, aParams) {
             let tab = this.parent.getTabAt(tabIndex);
             this.parent.gBrowser.getBrowserForTab(tab).stop();
         },
@@ -754,7 +754,7 @@ this.TabsManager = {
         },
 
         //TODO: fix tab reordering on move - each tab tries to be near the targetIndex
-        moveTab : function(tabIndex, aParams) {
+        moveTabAt : function(tabIndex, aParams) {
             let indexIdMap = aParams.mapCopy;
             let behavior = aParams.placing.behavior;
             let placeIndex = aParams.placing.placeIndex;
@@ -794,13 +794,13 @@ this.TabsManager = {
             }
         },
 
-        switchToTab : function(tabIndex, aParams) {
+        switchTabAt : function(tabIndex, aParams) {
             let tab = this.parent.getTabAt(tabIndex);
             let window = tabs_utils.getOwnerWindow(tab);
             tabs_utils.activateTab(tab, window);
         },
 
-        togglePinning : function(tabIndex, aParams) {
+        togglePinningAt : function(tabIndex, aParams) {
             let tab = this.parent.getTabAt(tabIndex, aParams.mapCopy);
             if (!tab.pinned)
                 this.parent.gBrowser.pinTab(tab);
@@ -808,7 +808,7 @@ this.TabsManager = {
                 this.parent.gBrowser.unpinTab(tab);
         },
 
-        bookmarkTab : function(tabIndex, aParams) {
+        bookmarkTabAt : function(tabIndex, aParams) {
             function searchFolder(title, parentFolder = bookmarksService.unfiledBookmarksFolder) {
                 let options = historyService.getNewQueryOptions();
                 let query = historyService.getNewQuery();
@@ -959,7 +959,7 @@ this.TabsManager = {
             groupItem.newTab(NEWTAB_URL);
         },
         
-        closeGroup : function(id) {
+        closeGroupAt : function(id) {
             let numberId = parseInt(id);
             let groupToClose = this.parent.groupItems._items.get(numberId);
 
@@ -1047,13 +1047,13 @@ this.TabsManager = {
 
             switch (action) {
                 case ACTION_CREATE:
-                        doAction.forTab = tabActs.openTab.bind(tabActs);
+                        doAction.forTab = tabActs.openTabAt.bind(tabActs);
                         doAction.forGroup = tabActs.createGroup.bind(tabActs);
                         doAction.forWindow = winActs.openWindow.bind(winActs);
                         break;
                 case ACTION_CLOSE:
-                        doAction.forTab = tabActs.closeTab.bind(tabActs);
-                        doAction.forGroup = tabActs.closeGroup.bind(tabActs);
+                        doAction.forTab = tabActs.closeTabAt.bind(tabActs);
+                        doAction.forGroup = tabActs.closeGroupAt.bind(tabActs);
                         doAction.forWindow = winActs.closeWindowAt.bind(winActs);
                         break;
                 case ACTION_GOTO_T: 
@@ -1061,25 +1061,25 @@ this.TabsManager = {
                 case ACTION_GOTO_W:
                         if(this.getArgumentType(cmd) != null){
                             target = cmd;
-                            doAction.forTab = tabActs.switchToTab.bind(tabActs);
+                            doAction.forTab = tabActs.switchTabAt.bind(tabActs);
                             doAction.forGroup = tabActs.changeGroupAt.bind(tabActs);
                             doAction.forWindow = winActs.switchToWindowAt.bind(winActs);
                         }
                         break;
                 case ACTION_BOOKMARK:
-                        doAction.forTab = tabActs.bookmarkTab.bind(tabActs);
+                        doAction.forTab = tabActs.bookmarkTabAt.bind(tabActs);
                         break;
                 case ACTION_TOGGLE_PINNING:
-                        doAction.forTab = tabActs.togglePinning.bind(tabActs);
+                        doAction.forTab = tabActs.togglePinningAt.bind(tabActs);
                         break;
                 case ACTION_MOVE:
-                        doAction.forTab = tabActs.moveTab.bind(tabActs);
+                        doAction.forTab = tabActs.moveTabAt.bind(tabActs);
                         break;
                 case ACTION_RELOAD_T:
-                        doAction.forTab = tabActs.reloadTab.bind(tabActs);
+                        doAction.forTab = tabActs.reloadTabAt.bind(tabActs);
                         break;
                 case ACTION_STOPLOAD_T:
-                        doAction.forTab = tabActs.stopLoadingTab.bind(tabActs);
+                        doAction.forTab = tabActs.stopLoadingTabAt.bind(tabActs);
                         break;
                 case ACTION_ALIAS:
                         break;
@@ -1167,7 +1167,7 @@ this.TabsManager = {
                        step = step > 0 ? -1*step : Math.abs(step) + 1; 
                        probeIndex = step + currIndex;
                    } while(!actionlessValues.includes(probeIndex.toString()));
-                   this.parent.actions.switchToTab(probeIndex);
+                   this.parent.actions.switchTabAt(probeIndex);
                }
             }
 
